@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  <title>Slicer documentation : www.ixi-software.net</title>
+  <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+
+
+<body>
+
+
+<p>Slicer<br>
+  Slicer is a sound app by <a href="http://www.ixi-software.net" target="_blank">www.ixi-audio.net</a><br>
+  version alpha 0.2 - Dec 2014.<br>
+</p>
+
+
+
+<p>Download page : <a target="_blank" href="http://www.ixi-software.net/software">http://www.ixi-audio.net/software</a><br>
+  <br>
+  Latest <strong>unstable</strong> versions of source code can be downloaded at your own risk from the 
+  <a target="_blank" href="http://devel.goto10.org">devel.goto10.org</a> svn server on section ixi &gt; python &gt; slicer</p>
+
+
+
+<p>Contents of documentation:<br>
+  - <a href="#description">Description</a><br>
+  - <a href="#license">License</a><br>
+  - <a href="#system">System requirements</a><br>
+  - <a href="#list">Mailing list</a><br>
+  - <a href="#instalation">Installation</a><br>
+  - <a href="#tutorial">Short tutorial / how to</a><br>
+  - <a href="#changes">Changes</a><br>
+  - <a href="#todo">To do</a><br>
+  - <a href="#aknow">Aknowledgements<br>
+  </a>- <a href="#trouble">Troubleshooting</a><br>
+  - <a href="#feedback">Feedback</a></p>
+
+
+<br><br>
+<p class="titles"> <a name="description"></a>Description:</p>
+
+<p> Slicer allows you to create rhythms and textures from any sound you import 
+  by moving the Slicer nodes. Slicer will chop your sound into slices and superpose 
+  them. The slices will be created and manipulated acording to the position of 
+  the control nodes (the ones represented by a square). The slicer nodes (in color) 
+  control volume (vertical) and pan(horizontal) of each slice, while the control 
+  nodes control pitch, length, shift and starting point for all the slices.</p>
+<p>A Slicer demo video is available at <a href="http://www.youtube.com/watch?v=rxvii1A3a-g" target="_blank">http://www.youtube.com/watch?v=rxvii1A3a-g</a></p>
+<p>Slicer has been constructed using Mirra, a Python 2D OpenGL graphics library 
+  developed by ixi. It can be downloaded from <a href="http://ixi-software.net/mirra" target="_blank">http://ixi-audio.net/mirra</a>. 
+  Find more detailed info on Mirra check <a href="http://ixi-software.net/content/download/mirra/documentation.html" target="_blank">http://ixi-audio.net/content/download/mirra/documentation.html</a> 
+</p>
+<p>&nbsp;</p>
+
+<p class="titles"><a name="license" id="license"></a>License : </p>
+
+<p>
+This application is free software; you can redistribute it and/or modify it
+under the terms of the GNU, General Public License as
+published by the Free Software Foundation. </p>
+
+<p>This aplication is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.<br>
+You should have received a copy of the GNU General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA<br>
+
+<br>
+
+Slicer contains parts and libraries by others such as 
+<a href="http://ixi-software.net/mirra" target="_blank">Mirra</a> (LGPL), 
+<a href="http://python.org" target="_blank">python</a>, 
+<a href="http://pygame.org" target="_blank">pygame</a> (GPL), 
+<a href="http://pyopengl.sourceforge.net" target="_blank">pyopengl</a> (BSD), and 
+<a href="http://wxpython.org" target="_blank">wxpython</a> (wxWindows Library Licence).</p>
+
+<p>&nbsp;</p>
+
+<p class="titles"><a name="system" id="system"></a>System requirements:</p>
+<p> Slicer works under any platform where Python and SCsynth runs. This means 
+  : OS X, Windows, GNU/Linux.<br>
+  The development has been done under GNU/Linux and even we test it under windows 
+  and OSX we encourage you to report problems you might encounter under windows 
+  and OSX. We test our apps in all platforms but probably not as in depth as you 
+  when you are using them!. 
+<p>Slicer should run ok on a 1100mhz PIII laptop with 258 RAM and 16M graphics 
+  card both under XP and GNU/Linux, but you might want to use a better graphics 
+  card for less CPU load. 
+<p>If you run Slicer from the python source you need the following dependencies<br>
+  <a href="http://python.org" target="_blank">python</a>, <a href="http://ixi-software.net/mirra" target="_blank">mirra</a>, 
+  <a href="http://pygame.org" target="_blank">pygame</a>, <a href="http://pyopengl.sourceforge.net" target="_blank">pyopengl</a>, 
+  <a href="http://wxpython.org" target="_blank">wxpython</a>
+<p>* <strong>Note For Windows users </strong>: Under some versions of Windows 
+  you might need to install as well GLUT32.dll to get OpenGL graphics running. 
+  This can be downloaded from http://www.xmission.com/%7Enate/glut.html . Just 
+  copy the glut32.dll into your c:\windows\system32 folder and it should work.</p>
+<p><b>* Note on firewalls </b>: Some firewalls like ZoneAlarm or the Windows XP 
+  firewall in some cases might try to block Slicer, this is because the graphics 
+  engine and the sound engine comunicate via internal network. Dont be afraid 
+  this is totally normal, in those cases you just need to grant permissions to 
+  Slicer (and maybe to scsynth, the sound engine). </p>
+
+<p>&nbsp;</p>
+
+
+
+<p class="titles"><a name="instalation" id="instalation"></a>Installation
+</p>
+
+<p>- OSX : Uncompress the zip, move the Slicer to any directory in your machine 
+  and just run it. <br>
+  - Windows : Uncompress the zip, copy the content to your machine and just run it.<br>
+  - GNU/Linux : install dependencies and run &quot;python slicer.py&quot; command.</p>
+<p>Please report errors or bugs to info AT ixi-software.net</p>
+<p>&nbsp;</p>
+
+<p class="titles"><a name="changes" id="changes"></a>Changes:</p>
+
+<p>0.1.6 :<br>
+- new sound engine based on python pyo
+- sessions and prefs are now json files
+- hundreds of other tweaks
+
+<p>0.1.6 :<br>
+- added wind control circle<br>
+- CTRL+Click on a node resets its movement direction<br>
+- keyboard shortcuts added<br>
+- fixed several small bugs related to session open/save <br>
+
+<p>0.1.5 :<br>
+  - added save/open session functionality<br>
+  - added box control speed pannel<br>
+  - upgraded to python 2.5 and pyOpenGL3 on windows version <br>
+  - on mac the sound folder moved out of the package
+<p>0.1.2 :<br>
+  - added lock nodes entries in General menu<br>
+  - added basic open and save functionality in File menu<br>
+  - added random situation of boxes and nodes independently in Auto menu<br>
+  - some optimisation in the render process with call lists and glRect
+<p>0.1.1 : <br>
+  - fixed ReleaseMouse problems <br>
+  - optimised performance bypassing mirra render methods to expose OpenGL on Slicer 
+  render methods <br>
+  - mac included latest standalone scsynth UB compiled by www.realizedsound.net<br>
+  - mac removed supercollider classes folder, it was not needed.<br>
+  - prefs.txt moved one level up from data folder</p>
+<p>0.1 : <br>
+  - switched to Python for graphics and SCsynth for the sound engine. </p>
+
+<p>&nbsp;</p>
+
+
+<p class="titles"><a name="tutorial" id="tutorial"></a>Short tutorial / how to:</p>
+Note that this is a quick description of the Slicer's features, you are welcome to write something more in depth and sent it to us to include
+here!
+
+<p> - Controls : <br>
+  Vertical and horizontal position of control nodes (the bigger squares) change 
+  pitch, start point, slice length and start point shift.<br>
+  Slice boxes (in color, surrounded by a circle) control pan and amplitude for 
+  each of the slices.<br>
+  Layers (in the background) show the chuck of the original sound that each slice 
+  is playing. Layers and slice boxes are associated, Layer number 0 and slice 
+  box number 0 represent sound slice number 0, they have same color and are labeled 
+  with the same number. Mute/unmute each slice by right clicking on the slice 
+  box or in the layer associated to it. If mute the slice box will be labeled 
+  as 'Muted' and its Layer display will fade away. The numbers in the left side 
+  of the layers display the start and end point of its sound slice, this is currently 
+  display as numbers ranging 0 to 1. Soon it will be displayed in milliseconds. 
+  We will also draw the shape of the sound in each layer. <br>
+  <br>
+  - Sounds :<br>
+  Slicer will automatically try to load all sounds in the "sounds" folder at start 
+  up into the sound pool. This means that they are loaded in RAM and accesible 
+  for use. You can add more sounds or folders with sounds from the sound pool 
+  menu. <br>
+  - Preferences :<br>
+  There is a file called prefs.txt next to the application where you can change 
+  your startup preferences. BEWARE that if you break the file formating this might 
+  not be read properly by Slicer. 
+<p>- Menu File &gt; Save / Open sessions :<br>
+  Slicer allows now to save/open sessions. A session is just a text file that 
+  saves the details of the system in a specific moment . By opening old files 
+  we can go back to previous situations. To make sure the sounds are found copy 
+  them to /sounds folder before importing them into Slicer.<br>
+  <br>
+  - Pitch control panel :<br>
+  This panel allows to set the top, central and bottom values for the pitch range. 
+  It allows to choose which pitch range we want to work with in Slicer. You MUST 
+  press the update values button for the new values to de updated. Setting Microtones 
+  option off will force the pitch transformation to be in tone steps. <br>
+  <br>
+  - Auto menu : Box auto movement pannel allow to set the speed of the box movement. 
+  This will change pan and volume for each slicer acording to the wandering of 
+  the boxes With node auto movement on, control nodes will do small jumps randomly. 
+  To stop them set speed to zero. 
+<p>&nbsp;</p>
+
+<p class="titles"><a name="todo" id="todo"></a>TO DO:
+</p>
+
+<p> <br>
+  - integrate with ixiQuarks. Set Busses out and sound pools<br>
+
+  - loop crossing control. in supercollider<br>
+  - bounce/wrap box movement on window limits<br>
+  - click dest point and asign it to box<br>
+  - flock behaviour add with pannel to control strenghts<br>
+  - hold playhead<br>
+  - reset > make it work properly<br>
+  - reset to mouse locH?<br>
+
+  - Some Windows users report that the mouse click point is few pixels above the actual position of the mouse, <br>
+  dragging the squares is almost impossible when this happens.<br>
+  - nodes jump back to prev position after dragged with mod key pressed<br>
+  - half a tone steps when microtones is off<br>
+  - draw wave on graph display -> enable/disable on menus<br>
+  - record path of boxes<br>
+  - move selected boxes with arrow keys and shift and from GAMEPAD<br>
+  - display shift/st point etc.. in millisecs<br>
+  - freeze sound loop like with old app<br>
+  - one parameter effect for individual layers that can be controlled from the ring<br>
+  - envelope in the display?<br>
+  - grid showing pitch add 1, -1 lines to display<br>
+  <br>
+  panel / menus:<br>
+  - help menu opens documentation on browser <br>
+  - plot wave out on panel like PD table<br>
+  - plot sound output spectrum<br>
+  - wxpannel with output general effects or filters (dist, delay, tremolo, lbp,hp, 
+  eq...)<br>
+  - On/Off microtones, audio, pitch, pan, amplitude slider * its all already on 
+  the menus, not sure if it is useful to have it here as well<br>
+  - out equalicer ?<br>
+  - gamepad mapping configuration panel<br>
+  # - file menu open/save/saveas to save configuration<br>
+  - fixed color gradient for display?<br>
+  - something like PD's wvvw external to select which part from the sound goes 
+  into the app?<br>
+  <br>
+  scsynth to do:<br>
+  loop crossing clicks remove<br>
+  reset/synch to mouse playheads<br>
+  rec to disk<br>
+  rec to buffer / save in disk?<br>
+  send length via osc<br>
+  effects<br>
+  <br>
+  wx to do :<br>
+  drag n drop on window?<br>
+  <br>
+  mirra to do:<br>
+  setMouseVisible in wxpython<br>
+  &nbsp;... <br>
+  email us with your request or ideas to info AT ixi-software.net </p>
+
+
+
+<p>&nbsp;</p>
+
+<p class="titles"><a name="aknow" id="aknow"></a>Aknowledgements :</p>
+
+
+<p>Some parts of the development of and Slicer Mirra were developed with the support 
+  from different institutions :<br>
+  - The Digital Research Unit at the University of Huddersfield. <a href="http://druh.co.uk" target="_blank">http://www.druh.co.uk</a><br>
+  - The Lansdown Center for Electronic Arts at Middlesex University who helped 
+  providing expertise and support for developing the early versions of Mirra. 
+  <a href="http://www.cea.mdx.ac.uk/" target="_blank">http://www.cea.mdx.ac.uk/</a><br>
+  - Bizkaiko Diputazioa, Basque Country.<br>
+  - Buchsenhausen Kunstlerhaus, Innsbruck, Austria.</p>
+<p>thanks to patrick, tom schoulten and tom betts for the technical help. </p>
+<br>
+
+<p class="titles"><a name="feedback" id="feedback"></a>Troubleshooting : </p>
+<p>&quot;I get clicks sometimes&quot; :<br>
+  some sounds click when crossing the loop point, this is in the to do list ... 
+  please be patient.</p>
+<p> Any other kind of errors :<br>
+  Under windows and mac in case of errors the application leaves a log file called 
+  &quot;slicer.log&quot; or &quot;slicer.exe.log where the errors are described, 
+  copy the text and send it to us in an email. Please include as much info as 
+  possible about the error and your system (OS version, soundcard, processor speed), 
+  we will try to help. On Linux just copy the error from the console.</p>
+<p>&nbsp;</p>
+<p class="titles"><a name="feedback" id="feedback"></a>Feedback : </p>
+
+<p>We would more than happy to hear your comments, suggestions or to incorporte 
+  any improvement you might do to our code. Contact us on <a href="http://www.ixi-audio.net" target="_blank">www.ixi-audio.net</a> 
+  <br>
+  If you have some music you have produced using Slider we would like to hear 
+  it. We keep links to ixi user's music in our Label section. <br>
+  <br>
+  enjoy.<br>
+<p>&nbsp;</p>
+</p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+BODY {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.titles{
+	background-color: #99CCCC;
+}
+.code {
+	color: #FF0000;
+}
+table {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}

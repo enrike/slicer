@@ -1,0 +1,146 @@
+
+SLICER
+@done
+# bigger window for more fine control
+# quit scsynth of quit
+# lower part graphics is hidden
+# draw arrow from center point to wind point
+
+prefs in json format
+# sessions in json format
+# change num layers resets all
+# there are two wind lines one on the right out of stage!
+# display individual amp where MUTE label appears in GREY!
+# random situation with no pitch change
+# automovement not working
+# marcar pitch 1 y -1
+# menu to lock new handle freedoms
+# random movement white node
+
+
+
+
+@to do
+
+** important issues to fix asap **
+situation does not save/load muted layers. does it do num of layers?. 
+toogle node automovement does not work. it should be independent from node movement speed variable
+Frame does not display the right size! menu eats part of the canvas. different behaviours in different versions of wx?
+remove TUIO from slicer.py and gui.py
+**
+
+allow to set layer colors in prefs file? and num of layers? (save colors to help recognise layers. maybe not if set on prefs)
+
+control per pixel con flechas teclado
+lock H/V with keys hold
+
+nodes wrap vs bounce?
+
+is there a limit to node speed?
+
+save node positions to a bank of situations controled from a panel. independent from sessions? to be able to switch between "snapshots"
+
+"drag" on demand vertical guides to mark hotspost on specific positions in the sound timeline
+
+* keyboard
+numeros 1/8 mute layers 0 -7?
+
+"solo" control for each node? mutes others but me
+
+explore pyo library for python dsp
+
+control M -> mute/unmute o solo M sin control?
+
+* OSC in
+control nodes desde tfn con OSCdroid?
+
+* control nodes :
+jump to point when selected
+move even when clicked / right click to force not move
+automovement? / short periodic jumps within a range
+
+save spew and debug msgs to a log file?
+
+SC :
+avoid error if scsynth is already open
+quitar clicks en loop o hacerlos opcionales ( en synthdef )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Slicer TO DO :
+
+stop individual nodes movement
+boost individual node volume
+(node control menu/panel: to control individual node parameters)
+loop crossing control. supercollider
+# change node direction ?
+# panel tendencia de movimiento de boxes-> x+xdelta+generalXtendency
+# bounce/wrap box movement
+click dest point and asign it to box (like in SIDIC)
+flock behaviour add with pannel to control strenghts
+hold playhead
+reset > make it work
+reset to mouse locH?
+
+# - integrate with ixiQuarks. Set Busses out and sound pools
+- draw wave on graph display - ask tom # enable/disable on menus
+# - block horizontal or vertical movement of handles when dragged by holding h or v key.
+- shift changes visualization mode (zooms into some particular shape or shows some other type of info that was otherwise invisible for any reason like being distracting)
+
+- record path of boxes
+- move selected boxes with arrow keys and shift / GAMEPAD
+- display shift/st point etc.. in millisecs
+- freeze sound loop like with old app
+- some one parameter effect for individual layers that can be controlled from the ring
+- volume is not properly set. dont need to divide amp by numOfLayers
+- envelope in the display?
+
+
+panel / menus:
+- snap to 1 pitch
+- layers max lenght (startpoint=0, lenght=max, shift=0)
+- plot wave out on panel like PD table
+- plot sound output spectrum
+- wxpannel with output general effects or filters (dist, delay, tremolo, lbp,hp, eq...)
+# - On/Off microtones, audio, pitch, pan, amplitude slider * its all already on the menus, do i need this?
+- snd pool menu error after adding new snd
+# - snd pool add snd folder
+- gamepad mapping configuration panel
+- fixed color gradient for display?
+- something like Toms externals to select which part from the sound goes into the app?
+
+
+sc to do:
+- list on jack
+- remove loop clicks
+rec to disk
+rec to buffer / save in disk?
+send lenght / loop via osc
+effects
+
+
+wx to do :
+drag n drop on window?
+
+
+mirra to do:
+setMouseVisible in wxpython
+
+
+
