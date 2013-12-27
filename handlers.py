@@ -58,14 +58,14 @@ class SmallBox(SRect) :
         self.updateLooper()
 
     def updateLooper(self) :
-        self.looper.pan.pan = self.calcPan()
+        self.looper.setPan( self.calcPan() )
         self.looper.vol( self.calcVol() )
 
-    # between 0 and 1. 
-    def calcPan(self) :
-        right = self.x/float(self.app.width)
-        left = abs(right - 1)
-        return  left, right # (self.x*(2.0/self.app.width)) -1
+    def calcPan(self) : # range 0 to 1 for eg. 
+        return self.x/float(self.app.width)
+##        left = self.x/float(self.app.width)
+##        right = abs(left - 1)
+##        return  [left, right] # (self.x*(2.0/self.app.width)) -1
 
     def calcVol(self) :
         if not self.app.vol : return 0 # to avoid /0 when no volume
@@ -186,14 +186,8 @@ class MovingSmallBox(SmallBox) :
 
         # finally update sounds and label
         self.moveLabel() # self.x, self.y
-        self.looper.pan.pan = self.calcPan()
+        self.looper.setPan( self.calcPan() )
         self.looper._mute = self.display.amp = self.calcVol()
-##        self.looper['pan'].pan = self.calcPan()
-##        self.looper['loop'].mul = self.display.amp = self.calcVol()
-##        self.looper.pan = self.calcPan()
-##        self.looper.amp = self.display.amp = self.calcVol()
-         
-
             
 
     def doTimeOut(self) :

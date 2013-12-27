@@ -409,7 +409,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
     #-----
     def onOpen(self, event):
         wildcard = "All files (*.*)|*.*"
-        dlg = wx.FileDialog(self, "Open file", mirra.utilities.get_cwd(),
+        dlg = wx.FileDialog(self, "Open file", mirra.utilities.get_main_dir(),
             style=wx.OPEN, wildcard = wildcard)
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetPath()
@@ -437,7 +437,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 
     def onImport(self, event):
         wildcard = "All files (*.*)|*.*"
-        dlg = wx.FileDialog(self, "Import file",  mirra.utilities.get_cwd(),
+        dlg = wx.FileDialog(self, "Import file",  mirra.utilities.get_main_dir(),
             style=wx.OPEN, wildcard = wildcard)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -445,7 +445,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 
     def onAddSnd(self, event):
         wildcard = "All files (*.*)|*.*"
-        dlg = wx.FileDialog(self, "Add sound file",  mirra.utilities.get_cwd(),
+        dlg = wx.FileDialog(self, "Add sound file",  mirra.utilities.get_main_dir(),
             style=wx.OPEN, wildcard = wildcard)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -453,7 +453,13 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         dlg.Destroy()
 
     def insertSnd(self, path) :
-        mb = self.GetMenuBar()
+##        mb = self.GetMenuBar()
+##        item = mb.Append(-1, os.path.basename(path))
+##        item.SetId( len(self.filePool) + 200 )
+##        self.Bind(wx.EVT_MENU, self.loadSnd, item)
+####        sndmenu.InsertItem(0, item)
+##        self.filePool.append(str(path)) # update snd pool           
+
         first = mb.FindItemById(200) # get first sound item
         sndmenu = first.GetMenu() # get snd menu
         
@@ -465,7 +471,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         self.filePool.append(str(path)) # update snd pool
 
     def onAddSndFolder(self, event) :
-        dlg = wx.DirDialog(self, "Add all sounds in directory",  mirra.utilities.get_cwd(), style=wx.DD_DEFAULT_STYLE)
+        dlg = wx.DirDialog(self, "Add all sounds in directory",  mirra.utilities.get_main_dir(), style=wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             for root, dirs, files in os.walk(path) :
@@ -481,7 +487,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 
     def SaveAs(self, event):
         wildcard = "All files (*.*)|*.*"
-        dlg = wx.FileDialog(self, "Save as", mirra.utilities.get_cwd(),
+        dlg = wx.FileDialog(self, "Save as", mirra.utilities.get_main_dir(),
             style=wx.SAVE | wx.OVERWRITE_PROMPT,
             wildcard = wildcard)
         if dlg.ShowModal() == wx.ID_OK:
@@ -500,7 +506,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 
     def doSndMenu(self) :
         l = []
-        p = os.path.join( mirra.utilities.get_cwd(), 'sounds')
+        p = os.path.join( mirra.utilities.get_main_dir(), 'sounds')
             
         for dirpath, dirnames, fname in os.walk(p) :
             for f in fname :
@@ -526,6 +532,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
     def swapSnd(self, e) :
         self.app.swapSndPath( str( self.filePool[ e.GetId()-200 ] ) )
     def loadSnd(self, e) :
+        print "filepool element", self.filePool[ e.GetId()-200 ] 
         self.app.loadSnd( str( self.filePool[ e.GetId()-200 ] ) )
     def changeBus(self, e) :
 ##            print e.GetId()-401, 'bus from menu'

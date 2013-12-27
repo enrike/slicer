@@ -1,13 +1,11 @@
 import os, time, sys
-from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern
+from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix
 
-
-##SNDS_PATH = os.path.join( os.getcwd(), 'sounds' )
 
 if getattr(sys, 'frozen', False):
     application_path = os.path.dirname(sys.executable)
 else: #if __file__:
-    application_path = os.getcwd() #os.path.dirname(__file__)
+    application_path = os.getcwd() 
 
 
 SNDS_PATH = os.path.join(application_path, 'sounds')
@@ -15,14 +13,7 @@ print "SNDS_PATH is ", SNDS_PATH
 
 pyoserver = None
 table = None
-##freeverb = None
-##mix = None
 
-
-##class ThreadServer(threading.Thread):
-##    def run(self):
-####        freev.ctrl(title='Freeverb')
-##        pyoserver.gui(timer=True)
 
 
 def startServer(rate=44100, audio='jack',  channels=2):
@@ -44,20 +35,12 @@ def startServer(rate=44100, audio='jack',  channels=2):
         pyoserver.boot()
         pyoserver.start()
 
-##        freeverb = Freeverb(pointer, size=0.50, damp=0.50, bal=0.50)
-##        mix = Mix(freev, voices=2).out()
-##        t = ThreadServer()
-##        t.start()
-##        t.join()
-
 def quitServer() :
         pyoserver.shutdown()
 
 def amp(amp):
         ''' global amp '''
         pyoserver.setAmp(amp)
-
-
 
 def recstart() :
     filename = 'slicer_%s_%s_%s_%s_%s_%s.aif' % time.localtime()[:6]
@@ -73,7 +56,6 @@ def recstop() :
         
 def createTable( filename ) :
     global table
-    
     path = os.path.join( SNDS_PATH, filename )
     
     if not os.path.isfile(path) :
@@ -89,39 +71,41 @@ def createTable( filename ) :
 
     tabdur = table.getDur()
     print 'length is', tabdur
+    channels = table.getSize(all=True)
+    stereoflag = isinstance(channels, list)        
+    print "stereo?", stereoflag
     
-    return tabdur
+    return tabdur, stereoflag
+
+
+
+
 
 class SlicerPlayer(object) :
         
-    def __init__(self, index=0) :
+    def __init__(self, stereo=False, index=0) :
         self._storedmul= None
         self.pos = 0
         self.index= index
+        self.stereo = stereo
+        print "Am I an stereo player?", stereo
 
         self._pitch = 1
         tabrate = table.getRate() # Return the frequency in cps at which the sound will be read at its original pitch.
         start = 0
 
-##        env = LinTable([(0,0),(300,1),(1000,.3),(8191,0)])
-##        env = CosTable([(0,0),(100,1),(500,.5),(8192,0)])
-# trig the amplitude envelope (no mix to keep the polyphony and not truncate an envelope)
-##        amp = TrigEnv(seq, table=env, dur=dur, mul=.3)
-
-##Fader(fadein=0.01, fadeout=0.10, dur=0, mul=1, add=0)
-
-##f = Adsr(attack=.01, decay=.2, sustain=.5, release=.1, dur=2, mul=.5)
-##a = BrownNoise(mul=f).mix(2).out()
-
-
         self.phasor = Phasor(freq=(self._pitch*tabrate), add=start, mul=1)
         self.pointer = Pointer(table=table, index=self.phasor, mul=1)
 ##        self.pointer.mix(1).out(index) #  each channel to one output. for an 8 multichaneel setup
-        self.pan = SPan(self.pointer, outs=2, pan=0.5)
-##        self.pan = SPan(self.pointer, outs=2, pan=[0.5, 0.5]) # thinner panning
-        self.pan.out()
+        
+        if self.stereo :
+            signal = self.pointer
+        else :
+            self.pan = SPan(self.pointer, outs=2, pan=0.5)
+            signal = self.pan
 
-
+        self.mix = Mix(signal, voices=2, mul=1)
+        self.mix.out()
 
         # poll phasor
         self.pat = Pattern(function=self.findpos, time=1/12).play()
@@ -140,23 +124,32 @@ class SlicerPlayer(object) :
     def setStart(self, n) :
         self.phasor.add = n
 
+    def setPan(self, n) :
+        if self.stereo:
+            self.pointer.mul = [n, abs(n - 1)]
+        else :
+            self.pan.pan = n
+        
     def gomute(self, flag) :
         if flag : # go mute
             self._storedmul = self.pointer.mul
-            self.pointer.mul = 0
+            self.mix.mul = 0
         else :
-            self.pointer.mul = self._storedmul
+            self.mix.mul = self._storedmul
             self._storedmul = None
 
     def vol(self, n) :
         if self._storedmul is not None : # muted
             self._storedmul = n # apply later
         else :
-            self.pointer.mul = n # directly
+            self.mix.mul = n # directly
 
     def updatetable(self) :
         self.pointer.table = table
         self.setPitch(self._pitch)
+
+    def stop(self):
+        self.pointer.stop()
             
         
         
@@ -169,14 +162,46 @@ if __name__ == '__main__' :
         import time
                     
         startServer()
-        createTable('numeros.wav')
-        sl = SlicerPlayer()
-        sl.setPitch(0.75)
-        sl.setStart(0.2)
-        sl.setDur(0.3)
         
+        # mono sound
+        length, stereo = createTable('mono_test.wav')
+        print length, stereo
+        sm = SlicerPlayer(stereo)
+
+        sm.setPan(0.5) # mono tables
+        time.sleep(1)
+        sm.setPan(1) # mono tables
+        time.sleep(1)
+        sm.setPan(0) # mono tables
+        time.sleep(1)
+
+        sm.stop()
+        
+        # stereo sound
+        length, stereo = createTable('stereo_test.wav')
+        print length, stereo
+        st = SlicerPlayer(stereo)
+        
+        st.setPan(0.5)
+        time.sleep(1)
+        st.setPan(0) 
+        time.sleep(1)
+        st.setPan(1) 
+        time.sleep(1)
+
+        st.stop()
+
+        # other options
+        length, stereo = createTable('numeros.wav')
+        print length, stereo
+        num= SlicerPlayer(stereo)
+        
+        num.setPitch(0.75)
+        num.setStart(0.2)
+        num.setDur(0.8)
+            
         while 1 :
             time.sleep(0.1)
-            print 'position is', sl.pos
+            print 'position is', num.pos
 ##        pyoserver.gui(locals())
         

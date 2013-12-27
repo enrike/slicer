@@ -230,10 +230,10 @@ class Slicer(main.App) :
 
         audio.startServer( self.samplerate )
 
-        audio.createTable(self.sndFile)
+        length, stereo = audio.createTable(self.sndFile)
         
         for b in xrange( self.numOfLayers ) : #buffers 1000-1007
-            looper = audio.SlicerPlayer(b)
+            looper = audio.SlicerPlayer(stereo, b)
             self.loopers.append( looper )        
 
             
@@ -372,7 +372,7 @@ class Slicer(main.App) :
 
 
     def loadSnd(self, filename) :
-        self.sndLength = audio.createTable(filename)
+        self.sndLength, stereo = audio.createTable(filename)
         if self.sndLength > -1 : 
             for p in self.loopers :
                 p.updatetable()
@@ -387,7 +387,7 @@ class Slicer(main.App) :
         
     def step(self) :
         self.statusbar.text = 'snd: %s | pitch: %s | length:%i | shift: %i | start: %i | granshift: %i | vol: %s' \
-                              % (self.snd['file'], self.pitch,self.grain,self.shift, self.sttime, self.grainshift, self.vol )
+                              % (self.sndFile, self.pitch,self.grain,self.shift, self.sttime, self.grainshift, self.vol )
         if self.flock :
             self.massCenter = self.averageCenter()
             self.flockSpeed = self.averageSpeed()
