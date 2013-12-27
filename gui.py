@@ -99,7 +99,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 
     def doFrame(self, canvas) :
         self.panels = { 'pitch' : 0, 'auto' : 0, 'flock' : 0 } #, 'effect1' : 0, 'effect2' : 0 } # one for each panel
-        self.doMenu()
+##        self.doMenu()
         self.doStructure(canvas)
 
 ##            self.Bind(wx.EVT_KEY_DOWN, self.KeyDown)
@@ -414,6 +414,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetPath()
             self.readFile()
+            self.insertSnd(self.filename)
         dlg.Destroy()
 
     def readFile(self) :
@@ -421,7 +422,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         if self.filename == '' or not self.filename: return -1
         
         try :
-            f = open(self.filename, 'rU')
+            f = open(mirra.utilities.getabspath(self.filename), 'rU')
             rawdata = f.read()
         except  IOError :
             print "ERROR : file %s does not exist" % self.filename

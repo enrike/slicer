@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from mirra import main
+from mirra import utilities
 from handlers import *
 
 import json
@@ -24,7 +25,7 @@ class Slicer(main.App) :
     """
 
     def setUp(self) :
-        """ set here the main window properties and characteristics
+        """ set here the main window properties and characteristics, JUST DEFAUT ONES IN THIS CASE
         """
         self.env = 'wx'
         self.caption = "Slicer" # window name
@@ -93,8 +94,8 @@ class Slicer(main.App) :
 
         print 'setting json session', jdata
 
-        self.sndFile = str( jdata[ 'sndFile' ] )  # scserver has problems with unicode strings
-        self.loadSnd( self.sndFile ) # load snd in SC
+        self.sndFile = str( jdata[ 'sndFile' ] )  #
+        self.loadSnd( self.sndFile ) 
         
         # **** display changes in GUI menus as well!! *****
         self.microtones = jdata[ 'microtones' ]  
@@ -173,7 +174,7 @@ class Slicer(main.App) :
         self.boxStep = 0  # boxes automovement
         self.autoNodes = 0
         self.microtones = 1
-        self.sndFile = 'oren2.wav'
+        self.sndFile = 'numeros.wav'
         self.synthName = 'StereoPlayer' # in this case are the same
         self.vol = 1    # volume
         self.numOfLayers = 8 # default to 8
@@ -205,7 +206,8 @@ class Slicer(main.App) :
 
         # trying to load session from prefs.txt
         if self.session != 0 and self.session != '' : # if a session was specified
-            self.window.frame.filename = os.path.join( utilities.get_cwd(), self.session )
+            self.window.frame.filename = utilities.getabspath( self.session )
+##            self.window.frame.filename = os.path.join( utilities.get_cwd(), self.session )
                 
         self.launchAudio()
         self.statusbar = StatusBar(self.width*0.5, self.height-6, 1, self.width+2, 27,
@@ -216,7 +218,8 @@ class Slicer(main.App) :
         if self.initRand or self.window.frame.readFile() == -1 :
             print "---> starting random situation"
             self.randomSituation() # not session specified
-
+        
+        self.window.frame.doMenu()
         self.window.frame.startMenus() # set initial Wx menus status
 
         self.setWindowProps() # something wrong in windows does not set the bgcolor
@@ -257,7 +260,7 @@ class Slicer(main.App) :
         self.windCircle = 0
         # prepare margins and distances for initialization block
         dw = self.width - 40 # width . 10 px margin on left and right
-        dh = self.height / (n + (n / 5.5) ) # 65 # height.
+        dh = self.height / (n + (n / 6.9) ) # 65 # height.
         inbetween = self.height / ( ( n + (n/dh) ) * 10 ) # 5
         dx = self.width * 0.5 # x loc: centered on stage
         dy = self.height / (n * 2) # y loc for first one
@@ -378,7 +381,9 @@ class Slicer(main.App) :
         for l, d in zip(self.loopers, self.displayList) :
             l.pos = d.calcLimits()[0] # all back to left limit, nomalised to 0-1
         
-    def end(self) : pass
+    def end(self) :
+        audio.quitServer()
+
         
     def step(self) :
         self.statusbar.text = 'snd: %s | pitch: %s | length:%i | shift: %i | start: %i | granshift: %i | vol: %s' \

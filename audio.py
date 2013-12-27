@@ -2,8 +2,16 @@ import os, time, sys
 from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern
 
 
-SNDS_PATH = os.path.join( os.getcwd(), 'sounds' )
+##SNDS_PATH = os.path.join( os.getcwd(), 'sounds' )
 
+if getattr(sys, 'frozen', False):
+    application_path = os.path.dirname(sys.executable)
+else: #if __file__:
+    application_path = os.getcwd() #os.path.dirname(__file__)
+
+
+SNDS_PATH = os.path.join(application_path, 'sounds')
+print "SNDS_PATH is ", SNDS_PATH
 
 pyoserver = None
 table = None
@@ -108,8 +116,12 @@ class SlicerPlayer(object) :
 
         self.phasor = Phasor(freq=(self._pitch*tabrate), add=start, mul=1)
         self.pointer = Pointer(table=table, index=self.phasor, mul=1)
+##        self.pointer.mix(1).out(index) #  each channel to one output. for an 8 multichaneel setup
         self.pan = SPan(self.pointer, outs=2, pan=0.5)
+##        self.pan = SPan(self.pointer, outs=2, pan=[0.5, 0.5]) # thinner panning
         self.pan.out()
+
+
 
         # poll phasor
         self.pat = Pattern(function=self.findpos, time=1/12).play()

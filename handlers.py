@@ -60,8 +60,13 @@ class SmallBox(SRect) :
     def updateLooper(self) :
         self.looper.pan.pan = self.calcPan()
         self.looper.vol( self.calcVol() )
+
     # between 0 and 1. 
-    def calcPan(self) : return self.x/float(self.app.width) # (self.x*(2.0/self.app.width)) -1
+    def calcPan(self) :
+        right = self.x/float(self.app.width)
+        left = abs(right - 1)
+        return  left, right # (self.x*(2.0/self.app.width)) -1
+
     def calcVol(self) :
         if not self.app.vol : return 0 # to avoid /0 when no volume
         return (((self.app.height - self.y) * (1.0 / self.app.height))) * self.app.vol
