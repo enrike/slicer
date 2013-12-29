@@ -21,8 +21,8 @@
 
 <p>Download page : <a target="_blank" href="http://www.ixi-software.net/software">http://www.ixi-audio.net/software</a><br>
   <br>
-  Latest <strong>unstable</strong> versions of source code can be downloaded at your own risk from the 
-  <a target="_blank" href="http://devel.goto10.org">devel.goto10.org</a> svn server on section ixi &gt; python &gt; slicer</p>
+  Latest <strong>unstable</strong> versions of source code can be downloaded at your own risk from 
+  <a target="_blank" href="http://github.com/enrike/slicer">http://github.com/enrike/slicer</a></p>
 
 
 
@@ -43,11 +43,11 @@
 <br><br>
 <p class="titles"> <a name="description"></a>Description:</p>
 
-<p> Slicer allows you to create rhythms and textures from any sound you import 
+<p> Slicer allows you to create rhythms and textures from any sound file you import 
   by moving the Slicer nodes. Slicer will chop your sound into slices and superpose 
-  them. The slices will be created and manipulated acording to the position of 
+  them. The slices will be created and manipulated according to the position of 
   the control nodes (the ones represented by a square). The slicer nodes (in color) 
-  control volume (vertical) and pan(horizontal) of each slice, while the control 
+  control volume (vertical) and pan (horizontal) of each slice, while the control 
   nodes control pitch, length, shift and starting point for all the slices.</p>
 <p>A Slicer demo video is available at <a href="http://www.youtube.com/watch?v=rxvii1A3a-g" target="_blank">http://www.youtube.com/watch?v=rxvii1A3a-g</a></p>
 <p>Slicer has been constructed using Mirra, a Python 2D OpenGL graphics library 
@@ -63,7 +63,7 @@ This application is free software; you can redistribute it and/or modify it
 under the terms of the GNU, General Public License as
 published by the Free Software Foundation. </p>
 
-<p>This aplication is distributed in the hope that it will be
+<p>This application is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details.<br>
@@ -79,13 +79,13 @@ Slicer contains parts and libraries by others such as
 <a href="http://pygame.org" target="_blank">pygame</a> (GPL), 
 <a href="http://pyopengl.sourceforge.net" target="_blank">pyopengl</a> (BSD), and 
 <a href="http://wxpython.org" target="_blank">wxpython</a> (wxWindows Library Licence).</p>
+<a href="http://code.google.com/p/pyo" target="_blank">Pyo</a> (GNU GPL v3).</p>
 
 <p>&nbsp;</p>
 
 <p class="titles"><a name="system" id="system"></a>System requirements:</p>
-<p> Slicer works under any platform where Python and SCsynth runs. This means 
-  : OS X, Windows, GNU/Linux.<br>
-  The development has been done under GNU/Linux and even we test it under windows 
+<p> Slicer works under OS X, Windows and GNU/Linux.<br>
+  The development has been done under GNU/Linux and even we test it under Windows 
   and OSX we encourage you to report problems you might encounter under windows 
   and OSX. We test our apps in all platforms but probably not as in depth as you 
   when you are using them!. 
@@ -95,17 +95,7 @@ Slicer contains parts and libraries by others such as
 <p>If you run Slicer from the python source you need the following dependencies<br>
   <a href="http://python.org" target="_blank">python</a>, <a href="http://ixi-software.net/mirra" target="_blank">mirra</a>, 
   <a href="http://pygame.org" target="_blank">pygame</a>, <a href="http://pyopengl.sourceforge.net" target="_blank">pyopengl</a>, 
-  <a href="http://wxpython.org" target="_blank">wxpython</a>
-<p>* <strong>Note For Windows users </strong>: Under some versions of Windows 
-  you might need to install as well GLUT32.dll to get OpenGL graphics running. 
-  This can be downloaded from http://www.xmission.com/%7Enate/glut.html . Just 
-  copy the glut32.dll into your c:\windows\system32 folder and it should work.</p>
-<p><b>* Note on firewalls </b>: Some firewalls like ZoneAlarm or the Windows XP 
-  firewall in some cases might try to block Slicer, this is because the graphics 
-  engine and the sound engine comunicate via internal network. Dont be afraid 
-  this is totally normal, in those cases you just need to grant permissions to 
-  Slicer (and maybe to scsynth, the sound engine). </p>
-
+  <a href="http://wxpython.org" target="_blank">wxpython</a>, <a href="http://code.google.com/p/pyo" target="_blank">Pyo</a></p>
 <p>&nbsp;</p>
 
 
@@ -113,14 +103,15 @@ Slicer contains parts and libraries by others such as
 <p class="titles"><a name="instalation" id="instalation"></a>Installation
 </p>
 
-<p>- OSX : Uncompress the zip, move the Slicer to any directory in your machine 
-  and just run it. <br>
-  - Windows : Uncompress the zip, copy the content to your machine and just run it.<br>
-  - GNU/Linux : install dependencies and run &quot;python slicer.py&quot; command.</p>
+<p>Uncompress the zip, move the Slicer to any directory in your machine 
+  and just run it. 
 <p>Please report errors or bugs to info AT ixi-software.net</p>
 <p>&nbsp;</p>
 
 <p class="titles"><a name="changes" id="changes"></a>Changes:</p>
+
+<p>0.2<br>
+- fixed many errors related to paths and multiplatform and audio engine
 
 <p>0.1.6 :<br>
 - new sound engine based on python pyo
@@ -167,9 +158,9 @@ here!
   each of the slices.<br>
   Layers (in the background) show the chuck of the original sound that each slice 
   is playing. Layers and slice boxes are associated, Layer number 0 and slice 
-  box number 0 represent sound slice number 0, they have same color and are labeled 
+  box number 0 represent sound slice number 0, they have same color and are labelled 
   with the same number. Mute/unmute each slice by right clicking on the slice 
-  box or in the layer associated to it. If mute the slice box will be labeled 
+  box or in the layer associated to it. If mute the slice box will be labelled 
   as 'Muted' and its Layer display will fade away. The numbers in the left side 
   of the layers display the start and end point of its sound slice, this is currently 
   display as numbers ranging 0 to 1. Soon it will be displayed in milliseconds. 
@@ -177,18 +168,18 @@ here!
   <br>
   - Sounds :<br>
   Slicer will automatically try to load all sounds in the "sounds" folder at start 
-  up into the sound pool. This means that they are loaded in RAM and accesible 
+  up into the sound pool. This means that they are loaded in RAM and accessible 
   for use. You can add more sounds or folders with sounds from the sound pool 
-  menu. <br>
+  menu. <br> Several file formats are compatible; wav, aiff, ogg ... both mono and stereo
   - Preferences :<br>
   There is a file called prefs.txt next to the application where you can change 
-  your startup preferences. BEWARE that if you break the file formating this might 
+  your startup preferences. BEWARE that if you break the file formatting this might 
   not be read properly by Slicer. 
 <p>- Menu File &gt; Save / Open sessions :<br>
   Slicer allows now to save/open sessions. A session is just a text file that 
   saves the details of the system in a specific moment . By opening old files 
-  we can go back to previous situations. To make sure the sounds are found copy 
-  them to /sounds folder before importing them into Slicer.<br>
+  we can go back to previous situations. To make sure the sounds are found by copying 
+  them to /sounds folder before importing to Slicer.<br>
   <br>
   - Pitch control panel :<br>
   This panel allows to set the top, central and bottom values for the pitch range. 
@@ -196,8 +187,8 @@ here!
   press the update values button for the new values to de updated. Setting Microtones 
   option off will force the pitch transformation to be in tone steps. <br>
   <br>
-  - Auto menu : Box auto movement pannel allow to set the speed of the box movement. 
-  This will change pan and volume for each slicer acording to the wandering of 
+  - Auto menu : Box auto movement panel allow to set the speed of the box movement. 
+  This will change pan and volume for each slicer according to the wandering of 
   the boxes With node auto movement on, control nodes will do small jumps randomly. 
   To stop them set speed to zero. 
 <p>&nbsp;</p>
@@ -206,9 +197,7 @@ here!
 </p>
 
 <p> <br>
-  - integrate with ixiQuarks. Set Busses out and sound pools<br>
-
-  - loop crossing control. in supercollider<br>
+  - loop crossing control<br>
   - bounce/wrap box movement on window limits<br>
   - click dest point and asign it to box<br>
   - flock behaviour add with pannel to control strenghts<br>
@@ -216,8 +205,6 @@ here!
   - reset > make it work properly<br>
   - reset to mouse locH?<br>
 
-  - Some Windows users report that the mouse click point is few pixels above the actual position of the mouse, <br>
-  dragging the squares is almost impossible when this happens.<br>
   - nodes jump back to prev position after dragged with mod key pressed<br>
   - half a tone steps when microtones is off<br>
   - draw wave on graph display -> enable/disable on menus<br>
@@ -243,15 +230,7 @@ here!
   - fixed color gradient for display?<br>
   - something like PD's wvvw external to select which part from the sound goes 
   into the app?<br>
-  <br>
-  scsynth to do:<br>
-  loop crossing clicks remove<br>
-  reset/synch to mouse playheads<br>
-  rec to disk<br>
-  rec to buffer / save in disk?<br>
-  send length via osc<br>
-  effects<br>
-  <br>
+  - rec to disk<br>
   wx to do :<br>
   drag n drop on window?<br>
   <br>
