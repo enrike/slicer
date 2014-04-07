@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 a = Analysis(['slicer.py'],
-             pathex=['C:\\Documents and Settings\\user\\My Documents\\Dropbox\\ixi\\python\\slicer'],
+             pathex=['/home/r2d2/Dropbox/ixi/python/slicer'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
@@ -10,8 +10,8 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
-          name='slicer.exe',
-          debug=False,
+          name='slicer',
+          debug=True,
           strip=None,
           upx=True,
-          console=False , icon='data\\ixi_transp.ico')
+          console=True , icon='dataixi_transp.ico')

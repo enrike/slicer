@@ -564,55 +564,24 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 ########################
     def pitch1(self, e) :
         if not self.panels[ 'pitch' ] : # open only one panel
-            p = Panel_1( self,  -1, "pitch", size=(140, 135) )
+            p = Panel_1( self,  -1, "pitch", size=(160, 165) )
             p.setProperties(self.app)
             p.Show(True)
             self.panels[ 'pitch' ] = p
 
     def onAutoPanel(self, e) :
         if not self.panels[ 'auto' ] : # open only one panel
-            p = Panel_Auto( self,  -1, "bounce", size=(120, 35) )
+            p = Panel_Auto( self,  -1, "bounce", size=(120, 60) )
             p.setProperties(self.app)
             p.Show(True)
             self.panels[ 'auto' ] = p
 
     def onFlockPanel(self, e) :
         if not self.panels[ 'flock' ] : # open only one panel
-            p = Panel_Flock( self,  -1, "flock", size=(175, 145) )
+            p = Panel_Flock( self,  -1, "flock", size=(185, 175) )
             p.setProperties(self.app)
             p.Show(True)
             self.panels[ 'flock' ] = p
-
-####        def onEffect1(self, e) :
-####            p = scpanels.Distortion( self,  -1, title="distortion", size=(340, 155) )
-####            p.Show(True)
-##
-##        def onEffect2(self, e) :
-##            p = scpanels.Delay( self,  -1, title="delay", size=(340, 155) )
-##            p.Show(True)
-##
-##        def onEffect3(self, e) :
-##            p = scpanels.Freeverb( self,  -1, title="freeverb", size=(340, 185) )
-##            p.Show(True)
-##
-##        def onEffect4(self, e) :
-##            p = scpanels.Octave( self,  -1, title="octave", size=(340, 215) )
-##            p.Show(True)
-##
-##        def onEffect5(self, e) :
-##            p = scpanels.Tremolo( self,  -1, title="tremolo", size=(340, 155) )
-##            p.Show(True)
-##
-##        def onEffect6(self, e) :
-##            p = scpanels.Equaliser( self,  -1, title="equaliser", size=(340, 135) )
-##            p.Show(True)
-##
-####        def onEffect7(self, e) :
-####            p = scpanels.Cyberpunk( self,  -1, title="cyberpunk", size=(340, 185) )
-####            p.Show(True)
-
-
-
 
 class MirraWxPanel(wx.Frame) :
     """ general panel

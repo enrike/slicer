@@ -45,13 +45,15 @@ class Slicer(main.App) :
         ''' read from the variable the prefs that were already loaded by mirra
         {"setup": {"fullscreen": false, "framerate": 8, "pos": [0, 0], "size": [1024, 768]},
         "start": {"bgColor": [0.7, 0.7, 0.7], "mouseVisible": true}, "slicer": {"session": "long1.txt"},
-        "scsynth": {"spew": false, "samplerate": 44100, "verbose": false}}
+        "audio": {"jack": false, "samplerate": 44100}}
         '''
         # it is already loaded by mirra
-        self.verbose =  self.jsondata['scsynth']['verbose']  # print msgs to audio engine True / False
-        self.spew =  self.jsondata['scsynth']['spew']  # print audio engine answers True / False
-        self.samplerate = self.jsondata['scsynth']['samplerate'] 
+##        self.verbose =  self.jsondata['scsynth']['verbose']  # print msgs to audio engine True / False
+##        self.spew =  self.jsondata['scsynth']['spew']  # print audio engine answers True / False
+        self.jack = self.jsondata['audio']['jack'] 
+        self.samplerate = self.jsondata['audio']['samplerate'] 
         self.session = self.jsondata['slicer']['session']
+##        print "jack?", self.jack
         
 
     def getSessionJSON(self) : #, filename='slicer.txt') :
@@ -168,8 +170,8 @@ class Slicer(main.App) :
 
         # GENERAL APP VARIABLES # MIGHT be owewriten by prefs file !!!!*****
         self.session = 0
-        self.verbose = 0 # print error messages from SC
-        self.spew = 0
+##        self.verbose = 0 # print error messages from SC
+##        self.spew = 0
         self.snd = {  'file' : '', 'bid' : 0 }
         self.boxStep = 0  # boxes automovement
         self.autoNodes = 0
@@ -228,7 +230,7 @@ class Slicer(main.App) :
     def launchAudio(self) :
         self.loopers = []
 
-        audio.startServer( self.samplerate )
+        audio.startServer( self.samplerate, self.jack )
 
         length, stereo = audio.createTable(self.sndFile)
         

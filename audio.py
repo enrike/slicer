@@ -1,5 +1,5 @@
 import os, time, sys
-from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix
+from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix#, PVShift
 
 
 if getattr(sys, 'frozen', False):
@@ -16,8 +16,14 @@ table = None
 
 
 
-def startServer(rate=44100, audio='jack',  channels=2):
+def startServer(rate=44100, jack=True,  channels=2):
         global pyoserver
+        
+        if jack :
+            audio= 'jack'
+        else:
+            audio = 'portaudio'
+            
         if sys.platform == 'win32' :
                 pyoserver = Server(
                                    sr=rate,
@@ -71,6 +77,7 @@ def createTable( filename ) :
 
     tabdur = table.getDur()
     print 'length is', tabdur
+    
     channels = table.getSize(all=True)
     stereoflag = isinstance(channels, list)        
     print "stereo?", stereoflag
@@ -105,6 +112,7 @@ class SlicerPlayer(object) :
             signal = self.pan
 
         self.mix = Mix(signal, voices=2, mul=1)
+##        PVShift(self.mix, shift=500).out()
         self.mix.out()
 
         # poll phasor
@@ -161,7 +169,7 @@ if __name__ == '__main__' :
         
         import time
                     
-        startServer()
+        startServer(jack=True)
         
         # mono sound
         length, stereo = createTable('mono_test.wav')
