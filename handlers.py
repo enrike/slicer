@@ -187,6 +187,7 @@ class MovingSmallBox(SmallBox) :
         # finally update sounds and label
         self.moveLabel() # self.x, self.y
         self.looper.setPan( self.calcPan() )
+        self.looper.vol( self.calcVol() )
         self.looper._mute = self.display.amp = self.calcVol()
             
 

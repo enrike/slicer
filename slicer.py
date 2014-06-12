@@ -14,7 +14,7 @@ import audio
 
 """ slicer. python interface connected to a supercollider scsyndef
 http://www.ixi-software.net
-License : GPL ->  Read doc/documentation.html
+cLicense : GPL ->  Read doc/documentation.html
 """
 
 
@@ -65,7 +65,7 @@ class Slicer(main.App) :
         for b in self.boxList :
              data['layers'].append( (b.x, b.y, b.looper.pointer.mul) )
 
-        data[ 'sndFile' ] = self.snd[ 'file' ] 
+        data[ 'sndFile' ] = self.sndFile # self.snd[ 'file' ]  ##! CORRECT ??
         data[ 'microtones' ] = self.microtones
         data[ 'vol' ] = self.vol
         data[ 'pitchLimits' ] = self.pitchLimits
@@ -172,11 +172,11 @@ class Slicer(main.App) :
         self.session = 0
 ##        self.verbose = 0 # print error messages from SC
 ##        self.spew = 0
-        self.snd = {  'file' : '', 'bid' : 0 }
+        self.snd = {  'file' : '', 'bid' : 0 } # legacy from SCSYNTH??
+        self.sndFile = 'numeros.wav' # ??
         self.boxStep = 0  # boxes automovement
         self.autoNodes = 0
         self.microtones = 1
-        self.sndFile = 'numeros.wav'
         self.synthName = 'StereoPlayer' # in this case are the same
         self.vol = 1    # volume
         self.numOfLayers = 8 # default to 8
@@ -378,6 +378,7 @@ class Slicer(main.App) :
         if self.sndLength > -1 : 
             for p in self.loopers :
                 p.updatetable()
+        self.sndFile = filename # in case it was triggered from menu
 
     def resetplayheads(self) :
         for l, d in zip(self.loopers, self.displayList) :
