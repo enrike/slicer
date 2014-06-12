@@ -19,7 +19,7 @@ class SmallBox(SRect) :
         SRect.__init__(self, x,y,z,w,h, c)
 
         self.display = display
-        self.constrainRect = 0, 0, self.app.width, self.app.height
+        #self.constrainRect = 0, 0, self.app.width, self.app.height
         self.oldcolor = c[0],c[1],c[2],1
         self.interactiveState = 2
         self.delta = [0,0]
@@ -123,7 +123,7 @@ class MovingSmallBox(SmallBox) :
         SmallBox.__init__(self, display, x,y,z,w,h, c) 
         self.timeOut = self.doTimeOut()
         self.delta = self.calcDelta()
-        self.constrainRect = 0, 0, self.app.size[0], self.app.size[1]
+        self.constrainRect = 0, 0, self.app.size[0], self.app.size[1]  / 2 ## /2 temp hack
         self.oldloc = 0
         self.mates = []
         # flock
@@ -175,8 +175,8 @@ class MovingSmallBox(SmallBox) :
             self.loc = constrainToRect( ( self.x + self.delta[0] + self.app.windDir[0] ) , \
                                         ( self.y + self.delta[1] + self.app.windDir[1] ) , self.constrainRect )
             if self.app.bounce : 
-                if self.x >= self.app.width or self.x <= 0 : self.delta[0] *= -1
-                if self.y >= self.app.height or self.y <= 0 : self.delta[1] *= -1
+                if self.x >= self.constrainRect [2] or self.x <= 0 : self.delta[0] *= -1
+                if self.y >= self.constrainRect [3] or self.y <= 0 : self.delta[1] *= -1
                 # should WRAP UP here
 ##            else : # stay in border
 ##                if self.x > self.app.width :  self.delta[0] = self.app.width
@@ -302,10 +302,9 @@ class WindHandle( Circle ) :
         super(ImageBlob, self).render()
         self.sq += 1
 
-    def render(self):
-        super(WindHandle, self).render()
-
-        engine.drawLine(self.loc, (self.app.width/2,  self.app.height/2), self.z, (1,0,0,1), 1, 0, 0xAAAA)
+#    def render(self):
+##        super(WindHandle, self).render()
+##        engine.drawLine(self.loc, (self.app.width/2,  self.app.height/2), self.z, (1,0,0,1), 1, 0, 0xAAAA)
 
 ##        glEnable(GL_LINE_STIPPLE)
 ##        glPushMatrix()
@@ -485,15 +484,15 @@ class WhiteHandle(HandleBase) :
     def doTimeOut(self) :
         return time.time()+ utilities.randint(120, 240) # 120, 240) # 2 to 4 min
 
-    def step(self) :
-        if self.app.autoNodes and time.time() >= self.timeOut :
-            self.x += self.delta[0]
-            self.y += self.delta[1]
-            if self.x >= self.app.width or self.x <= 0 : self.delta[0] *= -1
-            if self.y >= self.app.height or self.y <= 0 : self.delta[1] *= -1
-            self.updateVars()
-            self.updateDisplays() # if dragged
-            self.timeOut = self.doTimeOut() # again
+##    def step(self) :
+##        if self.app.autoNodes  and time.time() >= self.timeOut :
+##            self.x += self.delta[0]
+##            self.y += self.delta[1]
+##            if self.x >= self.app.width or self.x <= 0 : self.delta[0] *= -1
+##            if self.y >= self.app.height or self.y <= 0 : self.delta[1] *= -1
+##            self.updateVars()
+##            self.updateDisplays() # if dragged
+##            self.timeOut = self.doTimeOut() # again
 
     def calcDelta(self) :
         deltax = deltay = 0
@@ -511,6 +510,11 @@ class WhiteHandle(HandleBase) :
 
         self.updateVars()
         self.updateDisplays() # if dragged
+
+##    def render(self):
+##        super(WhiteHandle, self).render()
+##        engine.drawLine( (self.loc[0]+20, 0), (self.loc[0]+20,  self.app.height), self.z, (1,0,0,1), 1, 0, 0xAAAA)
+
 
 
 
@@ -637,9 +641,22 @@ class Display(Rect) :
         # marquee
 ##        glCallList(self.z+1)
         self.playhead = (self.app.loopers[self.z].pos * self.width) + bgleft
+
+        # reference line
+        glColor4fv( self.forecolor ) 
+        glPushMatrix()
+        glTranslatef( x, 0, -self.z ) # translate to GL loc ppint
+        glLineWidth(1)
+        glBegin(GL_LINES)
+        glVertex2f( -w, 0) # line ends
+        glVertex2f( -w, self.app.height )
+        glVertex2f( w, 0) # line ends
+        glVertex2f( w, self.app.height )
+        glEnd()
+        glPopMatrix()
         
         # playhead line
-        glColor4fv( (1,0,0,1) ) # EVERYTHING below goes red but normal volume
+        glColor4fv( (1,0,0,1) ) ### EVERYTHING below goes red but normal volume ###
         glPushMatrix()
         glTranslatef( self.playhead, self.y, -self.z ) # translate to GL loc ppint
         glLineWidth(1)
