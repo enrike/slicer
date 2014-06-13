@@ -134,7 +134,7 @@ class SlicerPlayer(object) :
 
     def setPan(self, n) :
         if self.stereo:
-            self.pointer.mul = [n, abs(n - 1)]
+            self.pointer.mul = [abs(n - 1), n]
         else :
             self.pan.pan = n
         
