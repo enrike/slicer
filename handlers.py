@@ -302,9 +302,9 @@ class WindHandle( Circle ) :
         super(ImageBlob, self).render()
         self.sq += 1
 
-#    def render(self):
-##        super(WindHandle, self).render()
-##        engine.drawLine(self.loc, (self.app.width/2,  self.app.height/2), self.z, (1,0,0,1), 1, 0, 0xAAAA)
+    def render(self):
+        super(WindHandle, self).render()
+        engine.drawLine(self.loc, (self.app.width/2,  self.app.height/2), self.z, (1,0,0,1), 1, 0, 0xAAAA)
 
 ##        glEnable(GL_LINE_STIPPLE)
 ##        glPushMatrix()

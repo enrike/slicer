@@ -53,6 +53,7 @@ class Slicer(main.App) :
         self.jack = self.jsondata['audio']['jack'] 
         self.samplerate = self.jsondata['audio']['samplerate'] 
         self.session = self.jsondata['slicer']['session']
+        self.constrain = self.jsondata['slicer']['constrain']
 ##        print "jack?", self.jack
         
 
@@ -191,6 +192,8 @@ class Slicer(main.App) :
         self.drawZeroY = 0
         self.drawOneY = 0
 
+        self.constrain = 0, 0, self.size[0], self.size[1]
+
         # flock
         self.flock = 0
         self.followtheflockF = 0.01
@@ -277,6 +280,7 @@ class Slicer(main.App) :
             y = self.height*0.3
             box = MovingSmallBox(display, x, y, z+20, 9, 9, c) # z+20 to go on top of displays and other stuff
             self.boxList.append(box)
+            box.constrainRect = self.constrain #
             display.mybox = box # has to remember whos related to
             
             dy += dh+inbetween # y loc for next one
