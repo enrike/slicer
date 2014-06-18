@@ -169,7 +169,7 @@ if __name__ == '__main__' :
         
         import time
                     
-        startServer(jack=True)
+        startServer(jack=True) #, rate=96000)
         
         # mono sound
         length, stereo = createTable('mono_test.wav')
