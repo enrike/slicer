@@ -1,5 +1,5 @@
 Slicer is a sound app by www.ixi-audio.net
-22/12/2013
+18/06/2014
 
 Check doc/documentation.html for more details
 

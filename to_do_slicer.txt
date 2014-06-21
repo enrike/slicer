@@ -6,7 +6,7 @@ SLICER
 # lower part graphics is hidden
 # draw arrow from center point to wind point
 
-prefs in json format
+# prefs in json format
 # sessions in json format
 # change num layers resets all
 # there are two wind lines one on the right out of stage!
@@ -26,7 +26,6 @@ prefs in json format
 situation does not save/load muted layers. does it do num of layers?. 
 toogle node automovement does not work. it should be independent from node movement speed variable
 Frame does not display the right size! menu eats part of the canvas. different behaviours in different versions of wx?
-remove TUIO from slicer.py and gui.py
 **
 
 allow to set layer colors in prefs file? and num of layers? (save colors to help recognise layers. maybe not if set on prefs)
@@ -47,12 +46,7 @@ numeros 1/8 mute layers 0 -7?
 
 "solo" control for each node? mutes others but me
 
-explore pyo library for python dsp
-
 control M -> mute/unmute o solo M sin control?
-
-* OSC in
-control nodes desde tfn con OSCdroid?
 
 * control nodes :
 jump to point when selected
@@ -61,9 +55,6 @@ automovement? / short periodic jumps within a range
 
 save spew and debug msgs to a log file?
 
-SC :
-avoid error if scsynth is already open
-quitar clicks en loop o hacerlos opcionales ( en synthdef )
 
 
 
