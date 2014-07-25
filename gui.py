@@ -11,32 +11,47 @@ import mirra.utilities
 from mirra import tools
 ##    from mirra.tools import *
 
-##import scpanels
 
 #-- menus IDs. constants
 ID_OPEN	= wx.NewId()
-##            ID_IMPORT = wx.NewId()
 ID_SAVE	= wx.NewId()
 ID_SAVEAS        = wx.NewId()
 ID_EXIT	= wx.NewId()
 ID_HELP	= wx.NewId()
 ID_ABOUT	= wx.NewId()
 
-##            ID_SERVERRESTART = wx.NewId()
-##            ID_SERVERQUIT = wx.NewId()
+# ssnapshots menu
+ID_OPENSNAP	= wx.NewId()
+ID_SAVESNAP	= wx.NewId()
+ID_SAVEASSNAP       = wx.NewId()
+
+ID_LOAD0 = wx.NewId()
+ID_LOAD1 = wx.NewId()
+ID_LOAD2 = wx.NewId()
+ID_LOAD3 = wx.NewId()
+ID_LOAD4 = wx.NewId()
+ID_LOAD5 = wx.NewId()
+ID_LOAD6 = wx.NewId()
+ID_LOAD7 = wx.NewId()
+ID_LOAD8 = wx.NewId()
+ID_LOAD9 = wx.NewId()
+
+ID_SAVE0 = wx.NewId()
+ID_SAVE1 = wx.NewId()
+ID_SAVE2 = wx.NewId()
+ID_SAVE3 = wx.NewId()
+ID_SAVE4 = wx.NewId()
+ID_SAVE5 = wx.NewId()
+ID_SAVE6 = wx.NewId()
+ID_SAVE7 = wx.NewId()
+ID_SAVE8 = wx.NewId()
+ID_SAVE9 = wx.NewId()
+
 ID_AUTOPANEL = wx.NewId()
 ID_FLOCKPANEL = wx.NewId() 
 ##    ID_AUTOBOX = wx.NewId()
 ID_AUTONODE = wx.NewId()
 ID_BOUNCE = wx.NewId()
-
-####    ID_EFFECT1 = wx.NewId() 
-##    ID_EFFECT2 = wx.NewId() 
-##    ID_EFFECT3 = wx.NewId()
-##    ID_EFFECT4 = wx.NewId() 
-##    ID_EFFECT5 = wx.NewId()
-##    ID_EFFECT6 = wx.NewId()
-##    ID_EFFECT7 = wx.NewId() 
 
 ID_RANDOM = wx.NewId()
 ID_RANDOMBOXES = wx.NewId()
@@ -62,9 +77,7 @@ ID_ADDSND = wx.NewId()
 ID_ADDFOLDER = wx.NewId()
 
 ID_PITCH1 = wx.NewId() # panels
-##    ID_TUIOSTART = wx.NewId()
-##    ID_TUIOCLOSE = wx.NewId()
-ID_GAMEPAD = wx.NewId() # panels    
+##ID_GAMEPAD = wx.NewId() # panels    
 ID_RESET = wx.NewId() # layers
 ID_MICROTONES = wx.NewId()
 ID_PITCHLOCK = wx.NewId()
@@ -124,6 +137,25 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         menu.AppendSeparator()
 ##            menu.Append(ID_EXIT, "&Exit"+modKey+"X", "Terminate the program")
         menu.Append(ID_EXIT, "&Exit"+modKey+"Q", "Terminate the program")
+
+
+        #--SNAPSHOTS #
+        menuSnap = wx.Menu()
+        menuSnap.Append(ID_OPENSNAP, "&Open snapshot file", "open file")
+        menuSnap.Append(ID_SAVESNAP, "&Save current snapshots", "save file")
+        menuSnap.Append(ID_SAVEASSNAP, "&Save As current snapshots", "save as file")
+
+        for n in xrange(10):
+            arg2 = ("&Load snapshot %i" +modKey+"%i") % (n,n)
+            arg3 = "load snapshot %i" % n
+            menuSnap.Append(500+n, arg2, arg3)
+
+        for n in xrange(10, 20):
+            n2 = n-10
+            arg2 = ("&Store snapshot %i" +modKey+"%i") % (n2,n2)
+            arg3 = "Store snapshot %i" % n2
+            menuSnap.Append(500+n, arg2, arg3)
+        
         
          #-- Snd pool #
         menuPool = wx.Menu()
@@ -135,14 +167,6 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         menuPool.AppendSeparator()
         menuPool.Append(ID_ADDSND, "&add snd"+modKey+"A", "snd")
         menuPool.Append(ID_ADDFOLDER, "&add snd folder", "snd")
-
-##            # BUS menu #
-##            busMenu = wx.Menu()
-##            for bufIndex in xrange(52) :
-##                if bufIndex % 2 == 1 : 
-##                    bnum = "&%i,%i" % ( last, bufIndex ) # creates pair of nums : 0,1 - 2,3 - 4,5
-##                    busMenu.Append( 400+bufIndex, bnum, "bus", wx.ITEM_RADIO )
-##                last = bufIndex # remember for next time
         
         #-- master vol #
         vol = wx.Menu()
@@ -188,17 +212,9 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         menuAuto.Append(ID_RANDOMWHITENODESHORT, "&small random White Node"+modKey+"C", "small random White Nodes")
         menuAuto.Append(ID_RANDOMBLACKNODE, "&random Black Node"+modKey+"Z", "random Black Nodes")
 
-   
         #-- panels
         menuPanels = wx.Menu()
-##            menuPanels.Append(ID_EFFECT1, "&distortion panel", "distortion panel", wx.ITEM_CHECK)
-##            menuPanels.Append(ID_EFFECT2, "&delay panel", "delay panel", wx.ITEM_CHECK)
-##            menuPanels.Append(ID_EFFECT3, "&freverb panel", "freeverb panel", wx.ITEM_CHECK)
         menuPanels.Append(ID_PITCH1, "&pitch control", "pitch panel", wx.ITEM_CHECK)
-##            menuPanels.Append(ID_TUIOSTART, "&start/close TUIO", "start/close TUIO", wx.ITEM_CHECK)
-##            menuPanels.Append(ID_TUIOCLOSE, "&close TUIO", "close TUIO", wx.ITEM_CHECK)
-
-##            menuPanels.Append(ID_GAMEPAD, "&gamepad configuration", "gamepad", wx.ITEM_CHECK)
         menuPanels.AppendSeparator() # --------
         menuPanels.Append(ID_RESET, "&reset playheads", "reset")
         menuPanels.Append(ID_MICROTONES, "&toogle microtones", "microtones", wx.ITEM_CHECK)
@@ -208,17 +224,6 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         menuPanels.Append(ID_SHIFTLOC, "&loc shift", "shift", wx.ITEM_CHECK)
         menuPanels.Append(ID_LENGTHLOC, "&lock length", "length", wx.ITEM_CHECK)
         menuPanels.Append(ID_GRAINSHIFT, "&lock grain shift", "grain shift", wx.ITEM_CHECK)
-        
-
-##            # filters and effects
-##            effectPanels = wx.Menu()
-####            effectPanels.Append(ID_EFFECT1, "&distortion panel", "distortion panel", wx.ITEM_CHECK)
-##            effectPanels.Append(ID_EFFECT2, "&delay panel", "delay panel", wx.ITEM_CHECK)
-##            effectPanels.Append(ID_EFFECT3, "&freverb panel", "freeverb panel", wx.ITEM_CHECK)
-##            effectPanels.Append(ID_EFFECT4, "&octave panel", "octave panel", wx.ITEM_CHECK)
-##            effectPanels.Append(ID_EFFECT5, "&tremolo panel", "tremolo panel", wx.ITEM_CHECK)
-##            effectPanels.Append(ID_EFFECT6, "&equaliser panel", "equaliser panel", wx.ITEM_CHECK)
-####            effectPanels.Append(ID_EFFECT7, "&cyberpunk panel", "cyberpunk panel", wx.ITEM_CHECK)
         
         #-- About
         menuHelp = wx.Menu()
@@ -230,14 +235,12 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         #-- add all to menubar
         menuBar = wx.MenuBar()
         menuBar.Append(menu, "&File")
-##            menuBar.Append(menuServer, "&Snd Server")
+        menuBar.Append(menuSnap, "&Snapshots")
         menuBar.Append(menuPool, "&Snd Pool")
-##            menuBar.Append( busMenu, '&Buses' )
         menuBar.Append(vol, "&Volume")
         menuBar.Append(nol, "&Num of layers")
         menuBar.Append(menuAuto, "&Movement")
         menuBar.Append(menuPanels, "&General")
-##            menuBar.Append(effectPanels, "&Filters and effects")
         menuBar.Append(menuHelp, "&Help")
         self.SetMenuBar(menuBar) #-- set bar
 
@@ -248,17 +251,17 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         wx.EVT_MENU(self, ID_SAVE, self.onSave)
         wx.EVT_MENU(self, ID_SAVEAS, self.SaveAs)
         wx.EVT_MENU(self, ID_EXIT,  self.onQuit)
-##            # audio server
-##            wx.EVT_MENU(self, ID_SERVERRESTART, self.onRestartServer)
-##            wx.EVT_MENU(self, ID_SERVERQUIT,  self.onQuitServer)
+
+        # snapshots
+        wx.EVT_MENU(self, ID_OPENSNAP, self.onOpenSnap)
+        wx.EVT_MENU(self, ID_SAVESNAP, self.onSaveSnap)
+        wx.EVT_MENU(self, ID_SAVEASSNAP, self.SaveAsSnap)
+        self.Bind(wx.EVT_MENU, self.loadSnapshot, id=500, id2=519) # TODO
+        
         # snd pool menu
         self.Bind(wx.EVT_MENU, self.loadSnd, id=200, id2=sndIndex+200)
-##            self.Bind(wx.EVT_MENU, self.app.swapSndPath, id=200, id2=sndIndex+200)
         wx.EVT_MENU(self, ID_ADDSND, self.onAddSnd)
         wx.EVT_MENU(self, ID_ADDFOLDER, self.onAddSndFolder)
-
-        # buses
-##            self.Bind(wx.EVT_MENU, self.changeBus, id=400, id2=bufIndex+400)
         
         # NOL
         wx.EVT_MENU(self, ID_NOL1, self.onNol1)
@@ -269,6 +272,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         wx.EVT_MENU(self, ID_NOL6, self.onNol6)
         wx.EVT_MENU(self, ID_NOL7, self.onNol7)
         wx.EVT_MENU(self, ID_NOL8, self.onNol8)
+        
         # auto
         wx.EVT_MENU(self, ID_AUTOPANEL, self.onAutoPanel)
         wx.EVT_MENU(self, ID_FLOCKPANEL, self.onFlockPanel) 
@@ -284,20 +288,9 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         wx.EVT_MENU(self, ID_RANDOMWHITENODESHORT, self.randomWhiteNodeShort)
         wx.EVT_MENU(self, ID_RANDOMBLACKNODE, self.randomBlackNode)
 
-        # effects
-####            wx.EVT_MENU(self, ID_EFFECT1, self.onEffect1) 
-##            wx.EVT_MENU(self, ID_EFFECT2, self.onEffect2) 
-##            wx.EVT_MENU(self, ID_EFFECT3, self.onEffect3) 
-##            wx.EVT_MENU(self, ID_EFFECT4, self.onEffect4) 
-##            wx.EVT_MENU(self, ID_EFFECT5, self.onEffect5)
-##            wx.EVT_MENU(self, ID_EFFECT6, self.onEffect6)
-####            wx.EVT_MENU(self, ID_EFFECT7, self.onEffect7)
-        
         # general
         wx.EVT_MENU(self, ID_PITCH1, self.pitch1)
-##            wx.EVT_MENU(self, ID_TUIOSTART, self.TUIOstartclose)
-##            wx.EVT_MENU(self, ID_TUIOCLOSE, self.TUIOclose)
-        wx.EVT_MENU(self, ID_GAMEPAD, self.gamepad)
+##        wx.EVT_MENU(self, ID_GAMEPAD, self.gamepad)
         wx.EVT_MENU(self, ID_RESET, self.reset)
         wx.EVT_MENU(self, ID_MICROTONES, self.microtones)
 
@@ -307,10 +300,10 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         wx.EVT_MENU(self, ID_LENGTHLOC, self.lengthlock)
         wx.EVT_MENU(self, ID_GRAINSHIFT, self.grainshiftlock)
         
-
         # help
         wx.EVT_MENU(self, ID_HELP,  self.onHelp)
         wx.EVT_MENU(self, ID_ABOUT, self.onAbout)
+        
         # vol
         wx.EVT_MENU(self, ID_MUTE, self.onVol0)
         wx.EVT_MENU(self, ID_VOL1, self.onVol1)
@@ -327,17 +320,9 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         
 
     #-------- menu ---------------------------------------------
-    def onVol0(self, event):
-##            """ mute/unmute : toogle volume in this case
-##            """
-##            print "MUTE ---> current vol%i / old vol %i" % (self.app.vol, self.old_vol)
-##            if self.app.vol == 0 :
-##                self.app.vol = self.old_vol
-##            else :
-##                self.old_vol = self.app.vol 
-        self.app.vol = 0
 
     # change volume
+    def onVol0(self, event): self.app.vol = 0
     def onVol1(self, event): self.app.vol = 0.1 
     def onVol2(self, event): self.app.vol = 0.2 
     def onVol3(self, event): self.app.vol = 0.3 
@@ -416,6 +401,8 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
             self.readFile()
             self.insertSnd(self.filename)
         dlg.Destroy()
+
+    
 
     def readFile(self) :
         print "----> reading session data from file"
@@ -514,9 +501,65 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
 ##                        if dirname[0]  != '.' : # SVN folders on linux and hidden folders in general
                     l.append( os.path.join(dirpath, f) )
         return l
+
+    ## snapshot stuff
+    def onOpenSnap(self, event):
+        wildcard = "All files (*.*)|*.*"
+        dlg = wx.FileDialog(self, "Open file", mirra.utilities.get_main_dir(),
+            style=wx.OPEN, wildcard = wildcard)
+        if dlg.ShowModal() == wx.ID_OK:
+            self.filename = dlg.GetPath()
+            print "----> reading snapshots data from file"
+            if self.filename == '' or not self.filename: return -1
+            
+            try :
+                f = open(mirra.utilities.getabspath(self.filename), 'rU')
+                rawdata = f.read()
+            except  IOError :
+                print "ERROR : file %s does not exist" % self.filename
+                return -1
+            
+            self.app.loadSnapshots(rawdata)
+##            self.insertSnd(self.filename)
+        dlg.Destroy()
+
+    def loadSnapshot(self, e) :
+        try :
+            if e.GetId()-500 < 10:
+                self.app.setSnapshot(e.GetId()-500) #SET
+            else :
+                self.app.storeSnapshot(e.GetId()-510) # STORE
+        except KeyError:
+            print "error: sthere is no such snapshot"
+        
+    def onSaveSnap(self, event):
+        if not self.filename:
+            self.SaveAsSnap(event)
+        else:
+            self.SaveSnap()
+
+    def SaveSnap(self) :
+        data = self.app.getSnapshotJSON()
+        savedata = open(self.filename, 'w')
+        savedata.write(str(data))
+        savedata.close()
+
+    def SaveAsSnap(self, event):
+        wildcard = "All files (*.*)|*.*"
+        dlg = wx.FileDialog(self, "Save as", mirra.utilities.get_main_dir(),
+            style=wx.SAVE | wx.OVERWRITE_PROMPT,
+            wildcard = wildcard)
+        if dlg.ShowModal() == wx.ID_OK:
+            filename = dlg.GetPath()
+            if not os.path.splitext(filename)[1]:
+                filename = filename + '.txt'
+            self.filename = filename
+            self.SaveSnap()
+        dlg.Destroy()
+
     
     
-    def gamepad(self, e) : print 'open gamepad conf panel'
+##    def gamepad(self, e) : print 'open gamepad conf panel'
     def reset(self, e) : self.app.resetplayheads()
     def onAutoNode(self, e) : self.app.autoNodes = not self.app.autoNodes
     def onBounce(self, e) : self.app.bounce = not self.app.bounce  # ; print self.app.bounce
@@ -534,11 +577,6 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
     def loadSnd(self, e) :
         print "filepool element", self.filePool[ e.GetId()-200 ] 
         self.app.loadSnd( str( self.filePool[ e.GetId()-200 ] ) )
-    def changeBus(self, e) :
-##            print e.GetId()-401, 'bus from menu'
-        self.app.changeOutBus( e.GetId()-401 ) #*2 ) # -401 and *2 o get 0, 2, 4, 6, 8, and so on
-##        def onQuitServer(self, e): self.app.s.quit()
-##        def onRestartServer(self, e): self.app.s.quit(); self.app.launchAudio()
 
     def microtones(self, e) :
         self.app.microtones = e.GetInt()
@@ -552,10 +590,6 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         self.app.freedom[ 'length' ] = not e.GetInt()
     def grainshiftlock(self, e) :
         self.app.freedom[ 'grainshift' ] = not e.GetInt()
-
-##        def TUIOstartclose(self, e) : self.app.controlTUIO( not e.GetInt() )
-##        def TUIOclose(self, e) : self.app.controlTUIO(0)
-    
 
 
 

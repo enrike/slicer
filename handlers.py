@@ -647,12 +647,15 @@ class Display(Rect) :
         glPushMatrix()
         glTranslatef( x, 0, -self.z ) # translate to GL loc ppint
         glLineWidth(1)
+        glEnable(GL_LINE_STIPPLE)
+        glLineStipple(1, 0xF0F0)
         glBegin(GL_LINES)
         glVertex2f( -w, 0) # line ends
         glVertex2f( -w, self.app.height )
         glVertex2f( w, 0) # line ends
         glVertex2f( w, self.app.height )
         glEnd()
+        glDisable(GL_LINE_STIPPLE)
         glPopMatrix()
         
         # playhead line

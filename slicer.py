@@ -55,7 +55,105 @@ class Slicer(main.App) :
         self.session = self.jsondata['slicer']['session']
         self.constrain = self.jsondata['slicer']['constrain']
 ##        print "jack?", self.jack
+
+
+    def getCurrentSnapshot(self):
+        # but not json in this case
+        data = { 'layers' : [], 'nodes' : {}}
         
+        for b in self.boxList :
+             data['layers'].append( (b.x, b.y, b.looper.pointer.mul) )
+
+##        data[ 'sndFile' ] = self.sndFile # self.snd[ 'file' ]  ##! CORRECT ??
+##        data[ 'microtones' ] = self.microtones
+##        data[ 'vol' ] = self.vol
+##        data[ 'pitchLimits' ] = self.pitchLimits
+        data[ 'nodes' ]['black'] = self.handles['black'].x, self.handles['black'].y
+        data[ 'nodes' ]['white'] = self.handles['white'].x, self.handles['white'].y
+        data[ 'nodes' ]['grey'] = self.handles['grey'].x, self.handles['grey'].y
+
+##        data[ 'boxStep' ] = self.boxStep 
+##        data[ 'freedom' ] = self.freedom 
+##        data[ 'initRand' ] = self.initRand  
+##        data[ 'synthName' ] = self.synthName
+
+##        jdata = json.dumps(data)
+        print "current snapshot", data
+        
+        return data
+
+
+    def getSnapshotJSON(self):
+        """ returns json of the current snapshot set in memory
+        """
+        return json.dumps(self.snapshotData)
+
+
+    def loadSnapshots(self, rawdata):
+        """ loads json data containing 10 snapshots into self.snapshotData for later access
+        """
+        try :
+            jdata = json.loads(rawdata) # json decode
+        except :
+            print "ERROR parsing json snapshot data"
+            return -1
+
+        self.snapshotData = jdata
+        print 'load json snapshots from file', self.snapshotData
+
+    def storeSnapshot(self, index):
+        """ sets selected snapshot from currently loaded snapshots
+        """
+        self.snapshotData["snapshot%s" % index] = self.getCurrentSnapshot()
+        
+        
+    def setSnapshot(self, index):
+        """ sets selected snapshot from currently loaded snapshots
+        """
+        jdata = self.snapshotData["snapshot%s" % index]
+
+        print jdata
+
+##        self.sndFile = str( jdata[ 'sndFile' ] )  #
+##        self.loadSnd( self.sndFile ) 
+        
+        # **** display changes in GUI menus as well!! *****
+##        self.microtones = jdata[ 'microtones' ]  
+##        self.pitchLimits = jdata[ 'pitchLimits' ]
+##        self.boxStep = float(jdata[ 'boxStep' ])
+        self.numOfLayers = len( jdata['layers'] )
+##        self.freedom = jdata[ 'freedom' ]
+##        self.initRand = jdata[ 'initRand' ]
+##        self.synthName = jdata[ 'synthName' ]
+        #####
+
+##        self.drawZero() # update display
+
+##        self.vol = jdata[ 'vol' ] # !! just before updating volume in loopers, otherwise there is a burst of snd
+
+##        self.updatePitchLimits()
+##        self.redoLoopers() 	 
+##
+##        self.startLayers( self.numOfLayers )
+
+        for box, d in zip(self.boxList, jdata['layers']) :
+            box.x, box.y, box.looper.pointer.mul = d
+##            box.x, box.y, box.looper['loop'].mul = d 
+##            box.x, box.y, box.looper.mute = d 
+            box.updateLooper() # update
+            box.moveLabel() 
+        
+        self.handles['black'].x, self.handles['black'].y = jdata[ 'nodes' ]['black'] 
+        self.handles['white'].x, self.handles['white'].y = jdata[ 'nodes' ]['white']
+        self.handles['grey'].x, self.handles['grey'].y = jdata[ 'nodes' ]['grey']
+
+        for h in self.handles.values() :
+            h.updateVars()
+                        
+        h.updateDisplays() # last one does the job
+
+
+    # SESSIONS
 
     def getSessionJSON(self) : #, filename='slicer.txt') :
         """ returns current state from the application in JSON format
@@ -203,6 +301,8 @@ class Slicer(main.App) :
 ##        self.followmouseF = 0.005  
         self.maxspeed = 7
 
+        self.snapshotData = {}
+
         ## end declaring variables ############
 
         # they already were loaded since they are located in the prefs.tx json file
@@ -215,6 +315,7 @@ class Slicer(main.App) :
 ##            self.window.frame.filename = os.path.join( utilities.get_cwd(), self.session )
                 
         self.launchAudio()
+        
         self.statusbar = StatusBar(self.width*0.5, self.height-6, 1, self.width+2, 27,
                                    color=(0.85,0.85,0.85) )
         
@@ -227,7 +328,7 @@ class Slicer(main.App) :
         self.window.frame.doMenu()
         self.window.frame.startMenus() # set initial Wx menus status
 
-        self.setWindowProps() # something wrong in windows does not set the bgcolor
+        self.setWindowProps() # becausesomething wrong in windows does not set the bgcolor
 
 
     def launchAudio(self) :
