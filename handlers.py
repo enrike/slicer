@@ -61,8 +61,11 @@ class SmallBox(SRect) :
         self.looper.setPan( self.calcPan() )
         self.looper.vol( self.calcVol() )
 
-    def calcPan(self) : # range 0 to 1 for eg. 
-        return self.x/float(self.app.width)
+    def calcPan(self) : # range 0 to 1 for eg.
+        pan = self.x/float(self.app.width)
+        if pan < 0 : pan = 0 # limit
+        if pan > 1 : pan = 1
+        return pan
 ##        left = self.x/float(self.app.width)
 ##        right = abs(left - 1)
 ##        return  [left, right] # (self.x*(2.0/self.app.width)) -1

@@ -146,16 +146,18 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         menuSnap.Append(ID_SAVEASSNAP, "&Save As current snapshots", "save as file")
 
         for n in xrange(10):
-            arg2 = ("&Load snapshot %i" +modKey+"%i") % (n,n)
+            arg2 = ("&Load snapshot %i" + '\tShift-'+"%i") % (n,n)
             arg3 = "load snapshot %i" % n
             menuSnap.Append(500+n, arg2, arg3)
+
+        menuSnap.AppendSeparator() # --------
 
         for n in xrange(10, 20):
             n2 = n-10
             arg2 = ("&Store snapshot %i" +modKey+"%i") % (n2,n2)
             arg3 = "Store snapshot %i" % n2
             menuSnap.Append(500+n, arg2, arg3)
-        
+            
         
          #-- Snd pool #
         menuPool = wx.Menu()
@@ -440,7 +442,7 @@ class MyFrame(mirra.utilities.WxMirraFrame) :
         dlg.Destroy()
 
     def insertSnd(self, path) :
-##        mb = self.GetMenuBar()
+        mb = self.GetMenuBar()
 ##        item = mb.Append(-1, os.path.basename(path))
 ##        item.SetId( len(self.filePool) + 200 )
 ##        self.Bind(wx.EVT_MENU, self.loadSnd, item)

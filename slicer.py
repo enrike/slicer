@@ -494,8 +494,8 @@ class Slicer(main.App) :
 
         
     def step(self) :
-        self.statusbar.text = 'snd: %s | pitch: %s | length:%i | shift: %i | start: %i | granshift: %i | vol: %s' \
-                              % (self.sndFile, self.pitch,self.grain,self.shift, self.sttime, self.grainshift, self.vol )
+        self.statusbar.text = 'snd: %s | pitch: %s | length:%i | shift: %i | start: %i | granshift: %i | vol: %s | session: %s' \
+                              % (self.sndFile, self.pitch,self.grain,self.shift, self.sttime, self.grainshift, self.vol, self.session )
         if self.flock :
             self.massCenter = self.averageCenter()
             self.flockSpeed = self.averageSpeed()
