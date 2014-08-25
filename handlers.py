@@ -74,7 +74,7 @@ class SmallBox(SRect) :
         if not self.app.vol : return 0 # to avoid /0 when no volume
         vol = (((self.app.height - self.y) * (1.0 / self.app.height))) * self.app.vol
         if vol < 0 : vol = 0 
-        return 
+        return vol
 
     def render(self) : 
 ##        if glGetFloatv(GL_CURRENT_COLOR) != self.color :
