@@ -208,6 +208,11 @@ class Slicer(main.App) :
         self.synthName = jdata[ 'synthName' ]
         #####
 
+        try :
+            self.autoNodes =  jdata[ 'autoNodes' ]
+        except :
+            print "no autoNodes set in this session.. skiping..."
+
         self.drawZero() # update display
 
         self.vol = jdata[ 'vol' ] # !! just before updating volume in loopers, otherwise there is a burst of snd
