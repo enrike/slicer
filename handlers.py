@@ -1,12 +1,12 @@
 
 from mirra import main
 from mirra import utilities
-from mirra import engine # is it worth?
+from mirra import engine # just used once
 from mirra.tools import *
 
 import time
 
-from OpenGL.GL import * # i am using opengl calls in slicer.
+from OpenGL.GL import * 
 from OpenGL.GLUT import GLUT_BITMAP_8_BY_13, glutBitmapCharacter
 
 
@@ -32,12 +32,11 @@ class SmallBox(SRect) :
 
     def end(self) :
         self.label.end()
-##        self.looper.free() # ???
         super(SmallBox, self).end()
         
-    def rightMouseDown(self,x,y) :
-        self.display.mute() # pass event to display, they both need to react
-        self.mute()
+##    def rightMouseDown(self,x,y) : pass
+##        self.display.mute() # pass event to display, they both need to react
+##        self.mute()
 
     def mute(self) :
         if self.blend == 1 : #or self.getBlend() == 0 : # coz blend returns 0 if none
@@ -77,21 +76,10 @@ class SmallBox(SRect) :
         return vol
 
     def render(self) : 
-##        if glGetFloatv(GL_CURRENT_COLOR) != self.color :
         glColor4fv(self.color)
         glPushMatrix()
         glTranslatef(self.x, self.y, -self.z)
         glRectf(-self.width2, -self.height2 , self.width2, self.height2)
-
-        # Marquee 
-##        glColor4fv((0,0,0,1)) # black
-##        glLineWidth(1)
-##        glBegin(GL_LINE_LOOP)
-##        glVertex2f(-self.width2, -self.height2)
-##        glVertex2f(self.width2, -self.height2)
-##        glVertex2f(self.width2, self.height2)
-##        glVertex2f(-self.width2, self.height2)
-##        glEnd()
         glPopMatrix()
 
     def mouseDown(self,x,y) :
@@ -108,16 +96,12 @@ class SmallBox(SRect) :
         self.color = 1,0,0 # mark as red when selected
         self.display.color = self.color
         self.display.selected = 1
-##        self.app.selection.selected.append(self) ## !!
 
     def doDeselect(self) :
         self.color = self.oldcolor
         self.display.color = self.display.oldcolor
         self.display.selected = 0
-##        self.app.selection.selected.remove(self) ##!!
-##        self.delta = [0,0]
-
-
+        
 
 
 class MovingSmallBox(SmallBox) :
@@ -136,61 +120,17 @@ class MovingSmallBox(SmallBox) :
         self.f2 = 0
         self.f3 = 0
 
-##        self.move = 1
-
     def step(self) :
-##        if not self.move : return # individual movement switch
-##        if not self.app.flock and self.app.boxStep <= 0 : return
-        
-        if self.app.flock : # Flocking #
-##            print self.app.flock
-            self.f1 = (self.app.massCenter[0] - self.x)* self.app.followtheflockF, (self.app.massCenter[1] - self.y)* self.app.followtheflockF 
-            
-            c,d = self.avoidOthers()
-            self.f2 =  c * self.app.avoidothersF, d * self.app.avoidothersF
-
-            self.f3 = (self.app.flockSpeed[0] - self.delta[0])* self.app.matchyrspeedF,  (self.app.flockSpeed[1] - self.delta[1])* self.app.matchyrspeedF
-            
-    ##        if self.app.followmouse :
-    ##            mouse = self.tend_to_point(self.app.mouseLoc)
-    ##        else:
-    ##            mouse = self.avoid_point(self.app.mouseLoc)
-
-            x = self.delta[0] + self.f1[0] + self.f2[0] + self.f3[0]  #\
-    ##          + mouse[0] + self.app.wind[0]
-            y = self.delta[1] + self.f1[1] + self.f2[1] + self.f3[1]  #\
-    ##            + mouse[1] + self.app.wind[1] + self.app.gravityF
-            
-            self.delta = self.limitSpeed( [x,y] )  #limit if too fast 
-            
-            nextx = self.x + self.delta[0]
-            nexty = self.y + self.delta[1]  # calc new step
-
-            self.rotation = utilities.getAng( self.loc, (self.x + self.delta[0], self.y + self.delta[1]) )
-            limitedX, limitedY =  utilities.constrainToRect( (nextx+self.app.windDir[0]), \
-                                                             (nexty+self.app.windDir[1]),\
-                                                             (0,0,self.app.width, self.app.height))
-            self.loc = limitedX, limitedY # here we go
-##            self.moveLabel() # self.x, self.y
-##            self.looper.pan = self.calcPan()
-##            self.looper.amp = self.calcVol()
-            
-        elif self.app.autoNodes : # self.app.boxStep > 0 : # Moving but not flocking #
+        if self.app.autoNodes : 
             self.checkTimeOut()
             self.loc = constrainToRect( ( self.x + self.delta[0] + self.app.windDir[0] ) , \
-                                        ( self.y + self.delta[1] + self.app.windDir[1] ) , self.constrainRect )
+                                    ( self.y + self.delta[1] + self.app.windDir[1] ) , self.constrainRect )
             if self.app.bounce : 
                 if self.x >= self.constrainRect [2] or self.x <= 0 : self.delta[0] *= -1
                 if self.y >= self.constrainRect [3] or self.y <= 0 : self.delta[1] *= -1
-                # should WRAP UP here
-##            else : # stay in border
-##                if self.x > self.app.width :  self.delta[0] = self.app.width
-##                if self.x < 0 : self.delta[0] = 0
-##                if self.y > self.app.height :  self.delta[1] = self.app.height
-##                if self.y < 0 : self.delta[1] = 0
 
         # finally update sounds and label
-        self.moveLabel() # self.x, self.y
+        self.moveLabel()
         self.looper.setPan( self.calcPan() )
         self.looper.vol( self.calcVol() )
         self.looper._mute = self.display.amp = self.calcVol()
@@ -221,35 +161,35 @@ class MovingSmallBox(SmallBox) :
                 speed[1] = (speed[1]/abs(speed[1])) * self.app.maxspeed
         return speed
 
-    def tend_to_point(self, p) :
-        return (p[0] - self.x)*self.app.followmouseF, (p[1] - self.y)*self.app.followmouseF
-    
-    def avoid_point(self, p):
-        return (self.x - p[0])*self.app.followmouseF, (self.y - p[1])*self.app.followmouseF
-
-    def avoidOthers(self) :
-        x = y = 0
-        for o in self.app.boxList :
-            if o is not self :
-                if utilities.distance(self.loc, o.loc) < 100:
-                    x -= (o.x - self.x)
-                    y -= (o.y - self.y)
-        return x,y
+##    def tend_to_point(self, p) :
+##        return (p[0] - self.x)*self.app.followmouseF, (p[1] - self.y)*self.app.followmouseF
+##    
+##    def avoid_point(self, p):
+##        return (self.x - p[0])*self.app.followmouseF, (self.y - p[1])*self.app.followmouseF
+##
+##    def avoidOthers(self) :
+##        x = y = 0
+##        for o in self.app.boxList :
+##            if o is not self :
+##                if utilities.distance(self.loc, o.loc) < 100:
+##                    x -= (o.x - self.x)
+##                    y -= (o.y - self.y)
+##        return x,y
 
     def mouseDown( self, x,y ) :
-        if self.app.keyPressed == 308 : # CTL
+        if self.app.keyPressed == 16777249 : # CTRL. NOTE: this might not work in all computers
             self.delta = self.calcDelta() # new delta
 ##        if self.app.keyPressed == 308 : # M ?
 ##            self.move = not self.move # toggle
-        else :
-            if self.app.keyPressed == 74 : # J pressed
-                self.mates = self.app.selection.selected[:]
-                self.mates.append(self)
-                for o in self.mates : # my mates
-                    o.color = 0,1,0
-                    o.oldloc = o.loc
-
-            SmallBox.mouseDown( self, x,y ) # pass event
+##        else :
+##            if self.app.keyPressed == 74 : # J pressed
+##                self.mates = self.app.selection.selected[:]
+##                self.mates.append(self)
+##                for o in self.mates : # my mates
+##                    o.color = 0,1,0
+##                    o.oldloc = o.loc
+##
+        SmallBox.mouseDown( self, x,y ) # pass event
 
     def mouseUp(self, x, y) :
         if self.oldloc : # come back to where you where before the click
@@ -263,12 +203,6 @@ class MovingSmallBox(SmallBox) :
                 else :
                     self.color = self.oldcolor
             self.mates = []
-##            self.loc = self.oldloc # jumpback
-##            self.oldloc = 0 # forget about it
-##            if self.selected :
-##                self.color = 1,0,0 # still selected
-##            else :
-##                self.color = self.oldcolor
         SmallBox.mouseUp( self, x,y ) # pass event
 
 
@@ -287,8 +221,8 @@ class WindHandle( Circle ) :
     def drag(self, x, y) :
         Circle.drag(self, x,y)
         self.label.loc = self.x + 10 , self.y + 10
-        self.dir = ( x - self.w ) *0.025, ( y - self.h ) *0.025
-        self.label.text = "%.1f, %.1f" % (round(self.dir[0], 1), round(self.dir[1], 1))
+        self.dir = ( x - self.w ) *0.005, ( y - self.h ) *0.005
+        self.label.text = "%.2f, %.2f" % self.dir
         if self.blend ==1 :
             self.app.windDir = self.dir # update only if active
 
@@ -310,17 +244,6 @@ class WindHandle( Circle ) :
     def render(self):
         super(WindHandle, self).render()
         engine.drawLine(self.loc, (self.app.width/2,  self.app.height/2), self.z, (1,0,0,1), 1, 0, 0xAAAA)
-
-##        glEnable(GL_LINE_STIPPLE)
-##        glPushMatrix()
-##        glTranslatef(self.x, self.y, -self.z) # translate to GL loc ppint
-##            
-##        glBegin(GL_LINES)
-##        glVertex2f( self.x, self.y) # draw relative pixel points
-##        glVertex2f(self.app.width/2,  self.app.height/2)
-##        glEnd()
-##        glPopMatrix()
-##        glDisable(GL_LINE_STIPPLE)
         
         
 
@@ -337,42 +260,36 @@ class HandleBase(Rect) :
         self.updateDisplays()
         self.constrainRect = 0, 0, self.app.width, self.app.height
         self.style = 0xF0F0 # dashed
+        self.delta = [0,0]
 
     def render(self) : #,e) :
         glPushMatrix()
         glTranslatef(self.x, self.y, -self.z)
         # colored box #
         glColor4fv(self.color)
-##        try :
-##            glRectfv(self.v2[0], self.v2[2])
-##        except: # pyopengl3 bug 
         glBegin(GL_QUADS)
         glVertex2fv(self.v2[0])
         glVertex2fv(self.v2[1])
         glVertex2fv(self.v2[2])
         glVertex2fv(self.v2[3])
         glEnd()
-##            print 'render error on HandleBase render'
-        # Marquee starts #
-##        glColor4fv((0,0,0,1)) # black
-##        glLineWidth(1)
+##        glPopMatrix()
+        
+##        draw bigreference cross on top
+##        glEnable(GL_LINE_STIPPLE)
+##        glLineStipple(1, 0xBBBB)
 ##        glBegin(GL_LINE_LOOP)
-##        glVertex2fv(self.v2[0])
-##        glVertex2fv(self.v2[1])
-##        glVertex2fv(self.v2[2])
-##        glVertex2fv(self.v2[3])
+##        glVertex2i(-1000, 0) # draw pixel points
+##        glVertex2i(1000, 0)
+##        glVertex2i(0, -1000) # draw pixel points
+##        glVertex2i(0, 1000)
 ##        glEnd()
+##        glDisable(GL_LINE_STIPPLE)
         glPopMatrix()
         
-        #Draw my lines #
-##        glLineWidth(1)
-
-        # dont need this here, it is already set
-##        glColor4fv(self.color)
-
         if self.style :
-                glEnable(GL_LINE_STIPPLE)
-                glLineStipple(1, 0xAAAA)
+            glEnable(GL_LINE_STIPPLE)
+            glLineStipple(1, 0xAAAA)
                 
         for b in self.app.boxList :
             x = abs(self.x + (b.x - self.x) * 0.5) # calc loc point
@@ -395,24 +312,24 @@ class HandleBase(Rect) :
 
     def updateDisplays(self) :
         for d in self.app.displayList :
-            d.update()#self.x, self.y)
+            d.update()
+            
+    def step(self): # this allows to be controlled from OSC messages
+        if self.app.remoteControl: 
+            self.drag(self.loc[0] + self.delta[0], self.loc[1] + self.delta[1])
+        
 
 
 
-
-
-
-# old black
 class GreyHandle(HandleBase) :
     def __init__(self, x,y,z,w,h, color=(0.4, 0.4, 0.4)) :
         self.rev = self.app.height*0.5 # to reverse values from mouseY
         super(GreyHandle, self).__init__(x,y,z,w,h, color)
         self.style = 0xAAAA # dotted?
+        self.constrainRect = self.app.width/2, 0, self.app.width/2, self.app.height
 
     def updateVars(self) :
-##        self.app.grain = self.x
         self.setPitch(self.y) # +1) # plus 1 to avoid 0
-##        super(GreyHandle,self).updateDisplays()
 
     def setPitch(self, i) :
         if i < self.app.height*0.5 : # top. mouse range 0 to middle 300
@@ -423,7 +340,6 @@ class GreyHandle(HandleBase) :
         elif i == self.app.height*0.5 :# middle
             self.app.pitch = self.app.pitchLimits[1]
         else : # bottom. the difference is that mouse range is 300 to 600 here
-##            self.app.pitch = self.app.pitchLimits[1] - (self.app.pitchLimits[1] - ( self.app.pitchLimits[4] * abs(self.app.size[1] - i) ) )
             self.app.pitch = self.app.pitchLimits[2] + ( self.app.pitchLimits[4] * abs(self.app.height - i) )
 
         if not self.app.microtones :
@@ -438,14 +354,13 @@ class GreyHandle(HandleBase) :
     def drag(self, x, y) :
         if self.app.freedom[ 'pitch' ] : # y unlocked
             self.loc = constrainToRect( self.x, y + self.mouseoffset[1], self.constrainRect )
-##        if self.app.freedom[ 'length' ] : # x unlocked
-        self.loc = constrainToRect( x + self.mouseoffset[0], self.y, self.constrainRect)
 
+        self.loc = constrainToRect( x + self.mouseoffset[0], self.y, self.constrainRect)
         self.updateVars()
         self.updateDisplays() # if dragged
 
 
-# old grey
+
 class BlackHandle(HandleBase) :
     def __init__(self, x,y,z,w,h, color=(0, 0, 0)) :
         self.rev = self.app.height*0.5 # to reverse values from mouseY
@@ -454,8 +369,6 @@ class BlackHandle(HandleBase) :
     def updateVars(self) :
         self.app.grain = self.x
         self.app.grainshift = self.y - self.app.height/2
-##        self.setPitch(self.y) # +1) # plus 1 to avoid 0
-##        super(BlackHandle,self).updateDisplays()
 
     def drag(self, x, y) :
         if self.app.freedom[ 'grainshift' ] : # y unlocked
@@ -473,14 +386,9 @@ class BlackHandle(HandleBase) :
 class WhiteHandle(HandleBase) :
     """ special handle that jumps once in a while to a close new loc
     """
-##    def __init__(self, x,y,z,w,h, color=(0,0,0)) :
-##        super(WhiteHandle, self).__init__(x,y,z,w,h, color)
-##        self.constrainRect = 0, 0, self.app.width, self.app.height
-
     def updateVars(self) :
         self.app.sttime = self.x
         self.app.shift = int( (self.y - self.app.height*0.5) / 1.33) # limit it a bit
-##        super(WhiteHandle, self).updateDisplays()
 
     def start(self) :
         self.timeOut = self.doTimeOut()
@@ -488,16 +396,6 @@ class WhiteHandle(HandleBase) :
 
     def doTimeOut(self) :
         return time.time()+ utilities.randint(120, 240) # 120, 240) # 2 to 4 min
-
-##    def step(self) :
-##        if self.app.autoNodes  and time.time() >= self.timeOut :
-##            self.x += self.delta[0]
-##            self.y += self.delta[1]
-##            if self.x >= self.app.width or self.x <= 0 : self.delta[0] *= -1
-##            if self.y >= self.app.height or self.y <= 0 : self.delta[1] *= -1
-##            self.updateVars()
-##            self.updateDisplays() # if dragged
-##            self.timeOut = self.doTimeOut() # again
 
     def calcDelta(self) :
         deltax = deltay = 0
@@ -515,13 +413,6 @@ class WhiteHandle(HandleBase) :
 
         self.updateVars()
         self.updateDisplays() # if dragged
-
-##    def render(self):
-##        super(WhiteHandle, self).render()
-##        engine.drawLine( (self.loc[0]+20, 0), (self.loc[0]+20,  self.app.height), self.z, (1,0,0,1), 1, 0, 0xAAAA)
-
-
-
 
 
 
@@ -544,42 +435,18 @@ class Display(Rect) :
         font = 10 # font size
         labelx = 3 + self.x - self.width2
         labely = self.y + (self.height2) - 2
-        self.label = Text('dummytext', labelx, labely, self.z+1, 'helvetica', font, self.textcolors[0])
         self.num = Text(str(z), labelx, (self.y-self.height2+font+2), self.z+1, 'helvetica', font, self.textcolors[0]) # number, doesnt change
-
         self.mybox = 0 # to store ref to box where i am related to
         self.playhead = self.x - self.width2 # left position
 
-        # compile call list  	 
-        glNewList(self.z+1, GL_COMPILE) # unique int id for each list 	 
-##        glColor4fv(0.7, 0.7, 0.7, 1) # black? 	 
-        glPushMatrix()
-        glEnable(GL_LINE_STIPPLE)
-        glLineStipple(1, 0x1111) # 0x0101 dotted # 0x00FF  dashed #0x1C47  dash/dot/dash
-        glTranslatef(self.x, self.y, -self.z) # translate to GL loc ppint 	 
-        glLineWidth(1) 	 
-        glBegin(GL_LINE_LOOP) 	 
-        glVertex2f(-self.width2, -self.height2) 	 
-        glVertex2f(self.width2, -self.height2) 	 
-        glVertex2f(self.width2, self.height2) 	 
-        glVertex2f(-self.width2, self.height2) 	 
-        glEnd()
-        glDisable(GL_LINE_STIPPLE)
-        glPopMatrix() 	 
-        glEndList()
-
-   
     def end(self) : # extending end
-        self.label.end()
         self.num.end()
-        glDeleteLists( self.z+1, 1)
         super(Display, self).end() #
 
     def update(self) :#, x,y) :
         """ update selected area, check for limits
         """
         mysttime = self.app.sttime + self.z * self.app.shift
-##        myendtime = self.app.grain + self.z * self.app.grainshift
         myendtime = mysttime + self.app.grain + self.z * self.app.grainshift
         
         # it does work but took me time ...
@@ -596,41 +463,41 @@ class Display(Rect) :
             if myendtime > self.width : # cut on right
                 myendtime = self.width
 
-        if mysttime < 0 : #now cut on left
-            mysttime = 0
-            
-        if mysttime == myendtime : 
-            myendtime = mysttime+1
+        if mysttime < 0 : mysttime = 0 # now cut on left
+        if mysttime == myendtime : myendtime = mysttime+1
         
         self.limits = mysttime, myendtime
         
-        #self.app.loopers[self.z].start, self.app.loopers[self.z].end = self.calcLimits()
         st = ( mysttime/float(self.width) ) #* self.app.sndLength
-        dur =  ((myendtime-mysttime)/float(self.width) ) #*  self.app.sndLength 
-        
-##        if self.app.pitch > 0 :
-##            self.app.loopers[self.z].looper.start = st # forwards. start from beginning
-##        else :
-##            self.app.loopers[self.z].looper.start = st + dur # start from end. backwards
+        dur =  ((myendtime-mysttime)/float(self.width) ) #*  self.app.sndLength
 
+        # THIS SHOULD BE optional on drag vs on mouseup
         self.app.loopers[self.z].setStart( st ) 
-            
         self.app.loopers[self.z].setDur( dur )
-        self.label.text = '%f : %f' % (st*self.app.sndLength , dur*self.app.sndLength )
 
     def calcLimits(self) :
-        #v = 1.0/self.width # from 0 to 1 per pixel
-        #return self.limits[0]*v, self.limits[1]*v #l # start and end of slice
         return self.limits[0]/self.width, self.limits[1]/self.width
     
-    def render(self) : #,e) :
+    def render(self) : 
         if self.blend < 1:
             glColor3fv( (1,0,0) ) # dark grey this one
         else :
             glColor3fv(self.textcolors[0]) # 
         
         # marquee
-        glCallList(self.z+1)
+        glPushMatrix()
+        glEnable(GL_LINE_STIPPLE)
+        glLineStipple(1, 0x1111) # 0x0101 dotted # 0x00FF  dashed #0x1C47  dash/dot/dash
+        glTranslatef(self.x, self.y, -self.z) # translate to GL loc ppint 	 
+        glLineWidth(1) 	 
+        glBegin(GL_LINE_LOOP) 	 
+        glVertex2f(-self.width2, -self.height2) 	 
+        glVertex2f(self.width2, -self.height2) 	 
+        glVertex2f(self.width2, self.height2) 	 
+        glVertex2f(-self.width2, self.height2) 	 
+        glEnd()
+        glDisable(GL_LINE_STIPPLE)
+        glPopMatrix()
 
         bgleft = self.x - self.width2  # display's marquee left side
         w = (self.limits[1] - self.limits[0] + 1)*0.5 # half width of color area
@@ -644,7 +511,6 @@ class Display(Rect) :
         glPopMatrix()
 
         # marquee
-##        glCallList(self.z+1)
         self.playhead = (self.app.loopers[self.z].pos * self.width) + bgleft
 
         # reference line
@@ -686,16 +552,12 @@ class Display(Rect) :
             glColor3fv( (1,0,0) ) # dark grey this one
             txt ='MUTED' 
         else :
-            glColor3fv(self.textcolors[0]) # dark grey this one
-            txt =  'amp: %.2f' % round(self.amp, 2)
+            txt = ''
 
         glRasterPos3f(self.left + 25, self.top + 13, -self.z)
         
         for c in txt : 
             glutBitmapCharacter(GLUT_BITMAP_8_BY_13, ord(c))
-
-    def updateLabel(self) :
-        self.label.text = '%f : %f' % self.calcLimits() # start and end point
 
     def rightMouseDown(self,x,y) :
         self.mybox.mute() # small box too
@@ -705,17 +567,10 @@ class Display(Rect) :
     def mouseUp(self,x,y) : return -1 # pass event to background
 
     def mute(self) :
-        if self.blend == 1 : #or self.getBlend() == 0 : # coz blend returns 0 if none
+        if self.blend == 1 :
             self.blend = 0.3
             self.forecolor = self.forecolor[0], self.forecolor[1], self.forecolor[2], self.blend
-            self.label.color = self.num.color = self.textcolors[1]
         else:
             self.blend = 1
             self.forecolor = self.forecolor[0], self.forecolor[1], self.forecolor[2], self.blend
-            self.label.color = self.num.color = self.textcolors[0]
-
-##    def setplayhead(self, f) : # range 0 to 1 # left side + position in sound * how many px is the sound
-##        self.playhead = (self.x-self.width2) + f * self.width    #
-
-
 

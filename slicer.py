@@ -3,12 +3,14 @@
 from mirra import main
 from mirra import utilities
 from handlers import *
+from time import localtime
 
 import json
 import os
-
+from simpleOSC import *
 
 import audio
+import qtgui # QT GUI menus
 
 
 
@@ -27,17 +29,61 @@ class Slicer(main.App) :
     def setUp(self) :
         """ set here the main window properties and characteristics, JUST DEFAUT ONES IN THIS CASE
         """
-        self.env = 'wx'
         self.caption = "Slicer" # window name
-        self.size = 800, 600 # window size
-        self.pos = 10, 10 # window top left location
-        self.fullScreen = 0 # if fullScreen is on it will overwrite your pos and size to match the display's resolution
-        self.frameRate = 12 # set refresh framerate
 
-        from gui import MyFrame # import the module that contains your custom frame
-        self.frameClass = MyFrame # set the class
+        self.readSetUpPrefs()
 
+    def toggleOSCControl(self):
+        self.remoteControl = not self.remoteControl
 
+    def setOSC(self):
+        initOSCServer('127.0.1', 9001) # takes args : ip, port, mode --> 0 for basic server, 1 for threading server, 2 for forking server
+
+        setOSCHandler('/axis/1',    self.hid_vertical_0)
+        setOSCHandler('/axis/0',    self.hid_horizontal_0)
+        setOSCHandler('/axis/3',    self.hid_vertical_1)
+        setOSCHandler('/axis/2',    self.hid_horizontal_1)
+        setOSCHandler('/buttonDown/0',        self.hid_down_1)
+        setOSCHandler('/buttonDown/2',        self.hid_down_3)
+        setOSCHandler('/buttonDown/9',        self.hid_down_9)
+        
+        startOSCServer() # and now set it into action
+
+    # OSC messages to control de handles from HID device
+    def hid_vertical_0(self, addr, tags, data, source):
+        self.handles['black'].delta[1] = data[0] * 2.5
+    def hid_horizontal_0(self, addr, tags, data, source):
+        self.handles['black'].delta[0] = data[0] * 2.5
+    def hid_vertical_1(self, addr, tags, data, source):
+        self.handles['white'].delta[1] = data[0] * 2.5
+    def hid_horizontal_1(self, addr, tags, data, source):
+        self.handles['white'].delta[0] = data[0] * 2.5
+
+        
+    def hid_down_1(self, addr, tags, data, source):
+        self.randomSingleNode('white', 1)
+    def hid_down_3(self, addr, tags, data, source):
+        self.randomSingleNode('black', 1)
+    def hid_down_9(self, addr, tags, data, source):
+        self.remoteControl = not self.remoteControl
+            
+    # change number of layers
+    def nol(self, n) :
+        self.numOfLayers = n 
+        self.redoLoopers()
+        self.startLayers(n, reset=0)
+        self.startHandlers()
+        self.forceUpdate()
+
+    def saveSession(self, filepath=None) :
+        """ saves the sesion data as json into a txt file with the time name
+        """
+        data = self.getSessionJSON()
+        print "save session", filepath
+        savedata = open(filepath, 'w')
+        savedata.write(str(data))
+        savedata.close()
+        
 ######## open and save session files #############################
 
 
@@ -52,11 +98,11 @@ class Slicer(main.App) :
 ##        self.spew =  self.jsondata['scsynth']['spew']  # print audio engine answers True / False
         self.jack = self.jsondata['audio']['jack'] 
         self.samplerate = self.jsondata['audio']['samplerate'] 
-        self.session = self.jsondata['slicer']['session']
+        qtgui.fileName = self.jsondata['slicer']['session']
         self.constrain = self.jsondata['slicer']['constrain']
-##        print "jack?", self.jack
 
 
+    # SNAPSHOTS
     def getCurrentSnapshot(self):
         # but not json in this case
         data = { 'layers' : [], 'nodes' : {}}
@@ -64,20 +110,10 @@ class Slicer(main.App) :
         for b in self.boxList :
              data['layers'].append( (b.x, b.y, b.looper.pointer.mul) )
 
-##        data[ 'sndFile' ] = self.sndFile # self.snd[ 'file' ]  ##! CORRECT ??
-##        data[ 'microtones' ] = self.microtones
-##        data[ 'vol' ] = self.vol
-##        data[ 'pitchLimits' ] = self.pitchLimits
         data[ 'nodes' ]['black'] = self.handles['black'].x, self.handles['black'].y
         data[ 'nodes' ]['white'] = self.handles['white'].x, self.handles['white'].y
         data[ 'nodes' ]['grey'] = self.handles['grey'].x, self.handles['grey'].y
 
-##        data[ 'boxStep' ] = self.boxStep 
-##        data[ 'freedom' ] = self.freedom 
-##        data[ 'initRand' ] = self.initRand  
-##        data[ 'synthName' ] = self.synthName
-
-##        jdata = json.dumps(data)
         print "current snapshot", data
         
         return data
@@ -99,7 +135,7 @@ class Slicer(main.App) :
             return -1
 
         self.snapshotData = jdata
-        print 'load json snapshots from file', self.snapshotData
+##        print 'load json snapshots from file', self.snapshotData
 
     def storeSnapshot(self, index):
         """ sets selected snapshot from currently loaded snapshots
@@ -111,51 +147,23 @@ class Slicer(main.App) :
         """ sets selected snapshot from currently loaded snapshots
         """
         jdata = self.snapshotData["snapshot%s" % index]
-
-        print jdata
-
-##        self.sndFile = str( jdata[ 'sndFile' ] )  #
-##        self.loadSnd( self.sndFile ) 
         
-        # **** display changes in GUI menus as well!! *****
-##        self.microtones = jdata[ 'microtones' ]  
-##        self.pitchLimits = jdata[ 'pitchLimits' ]
-##        self.boxStep = float(jdata[ 'boxStep' ])
         self.numOfLayers = len( jdata['layers'] )
-##        self.freedom = jdata[ 'freedom' ]
-##        self.initRand = jdata[ 'initRand' ]
-##        self.synthName = jdata[ 'synthName' ]
-        #####
-
-##        self.drawZero() # update display
-
-##        self.vol = jdata[ 'vol' ] # !! just before updating volume in loopers, otherwise there is a burst of snd
-
-##        self.updatePitchLimits()
-##        self.redoLoopers() 	 
-##
-##        self.startLayers( self.numOfLayers )
 
         for box, d in zip(self.boxList, jdata['layers']) :
             box.x, box.y, box.looper.pointer.mul = d
-##            box.x, box.y, box.looper['loop'].mul = d 
-##            box.x, box.y, box.looper.mute = d 
             box.updateLooper() # update
             box.moveLabel() 
-        
-        self.handles['black'].x, self.handles['black'].y = jdata[ 'nodes' ]['black'] 
+ 
         self.handles['white'].x, self.handles['white'].y = jdata[ 'nodes' ]['white']
         self.handles['grey'].x, self.handles['grey'].y = jdata[ 'nodes' ]['grey']
 
-        for h in self.handles.values() :
-            h.updateVars()
-                        
-        h.updateDisplays() # last one does the job
+        self.forceUpdate()
 
 
     # SESSIONS
 
-    def getSessionJSON(self) : #, filename='slicer.txt') :
+    def getSessionJSON(self):
         """ returns current state from the application in JSON format
         called from gui.py on saving a session file
         """
@@ -165,23 +173,23 @@ class Slicer(main.App) :
              data['layers'].append( (b.x, b.y, b.looper.pointer.mul) )
 
         data[ 'sndFile' ] = self.sndFile # self.snd[ 'file' ]  ##! CORRECT ??
+        data[ 'sndPath' ] = self.sndPath
         data[ 'microtones' ] = self.microtones
         data[ 'vol' ] = self.vol
         data[ 'pitchLimits' ] = self.pitchLimits
         data[ 'nodes' ]['black'] = self.handles['black'].x, self.handles['black'].y
         data[ 'nodes' ]['white'] = self.handles['white'].x, self.handles['white'].y
         data[ 'nodes' ]['grey'] = self.handles['grey'].x, self.handles['grey'].y
-
         data[ 'boxStep' ] = self.boxStep 
         data[ 'freedom' ] = self.freedom 
-        data[ 'initRand' ] = self.initRand  
-        data[ 'synthName' ] = self.synthName
+        data[ 'initRand' ] = self.initRand
+        data['autoNodes'] = self.autoNodes
 
-        jdata = json.dumps(data)
-        print "saving session as json", jdata
-        
-        return jdata
+        data['sndfolders'] = qtgui.sndfolders
 
+        data['winSize'] = self.size
+                
+        return json.dumps(data)
 
     def setSession(self, rawdata) :
         """ sets new application state from data taken from session file
@@ -196,7 +204,13 @@ class Slicer(main.App) :
         print 'setting json session', jdata
 
         self.sndFile = str( jdata[ 'sndFile' ] )  #
-        self.loadSnd( self.sndFile ) 
+        self.loadSnd( self.sndFile )
+
+        try:
+            self.sndPath = str( jdata[ 'sndPath' ] )
+        except :
+            self.sndPath = ""
+            print "no sndPath in session file"
         
         # **** display changes in GUI menus as well!! *****
         self.microtones = jdata[ 'microtones' ]  
@@ -205,14 +219,18 @@ class Slicer(main.App) :
         self.numOfLayers = len( jdata['layers'] )
         self.freedom = jdata[ 'freedom' ]
         self.initRand = jdata[ 'initRand' ]
-        self.synthName = jdata[ 'synthName' ]
-        #####
 
         try :
             self.autoNodes =  jdata[ 'autoNodes' ]
         except :
             print "no autoNodes set in this session.. skiping..."
 
+        try:
+            if jdata['winSize'] != self.size :
+                print "WARNING: this session works well with a window size of %" % jdata['winSize']
+        except:
+            pass # silently skip. for backwards compatibility
+            
         self.drawZero() # update display
 
         self.vol = jdata[ 'vol' ] # !! just before updating volume in loopers, otherwise there is a burst of snd
@@ -221,11 +239,10 @@ class Slicer(main.App) :
         self.redoLoopers() 	 
 
         self.startLayers( self.numOfLayers )
+        self.startHandlers()
 
         for box, d in zip(self.boxList, jdata['layers']) :
             box.x, box.y, box.looper.pointer.mul = d
-##            box.x, box.y, box.looper['loop'].mul = d 
-##            box.x, box.y, box.looper.mute = d 
             box.updateLooper() # update
             box.moveLabel() 
         
@@ -233,6 +250,15 @@ class Slicer(main.App) :
         self.handles['white'].x, self.handles['white'].y = jdata[ 'nodes' ]['white']
         self.handles['grey'].x, self.handles['grey'].y = jdata[ 'nodes' ]['grey']
 
+        self.forceUpdate()
+     
+        try:
+            for folder in jdata[ 'sndfolders' ]:
+                qtgui.addFolder(folder)
+        except :
+            print "no sndfolders stored in this session.. skiping..."
+
+    def forceUpdate(self):
         for h in self.handles.values() :
             h.updateVars()
                         
@@ -250,41 +276,37 @@ class Slicer(main.App) :
         define properties, read prefs, open audio engine and init audio, create all objects,
         init Wx interface.
         """
-##        if sys.platform == 'win32' : #on windows we need to use wx to trigger the SCsynth process and we need a reference to the parent
-##            sc.scsynth.process.wxparentwin = self.window 
+        qtgui.do(self, self.window)
 
         # internal variables not set by user
         self.boxList = []
         self.handles = {} # []
         self.displayList = []
         self.selected = 0
-        self.joystate = [] # stores joysticks button combinations
-        self.joyactions = { "inc" : 4,
-                            "dec" : 5,
-                            "fast": 6
-                           } # maps keyboard buttons to actions
+##        self.joystate = [] # stores joysticks button combinations
+##        self.joyactions = { "inc" : 4,
+##                            "dec" : 5,
+##                            "fast": 6
+##                           } # maps keyboard buttons to actions
         self.loopers = []
         self.grain = 0 # lenght of layers
         self.grainshift = 0 # shift in the length
         self.sttime = 0 # starting time of first layer
         self.shift = 0 # shift inc delta
         self.pitch = 0 # snd pitch
-        self.sndLength = 0 # lenght of sound on PD in millisecs. Just for display purposes
+        self.sndLength = 0 # lenght of sound in millisecs. Just for display purposes
         self.displayPitch = 0 # to display
 
         # GENERAL APP VARIABLES # MIGHT be owewriten by prefs file !!!!*****
-        self.session = 0
-##        self.verbose = 0 # print error messages from SC
-##        self.spew = 0
-        self.snd = {  'file' : '', 'bid' : 0 } # legacy from SCSYNTH??
+##        self.session = 0
         self.sndFile = 'numeros.wav' # ??
+        self.sndPath = ""
         self.boxStep = 0  # boxes automovement
         self.autoNodes = 0
         self.microtones = 1
-        self.synthName = 'StereoPlayer' # in this case are the same
         self.vol = 1    # volume
-        self.numOfLayers = 8 # default to 8
-        self.samplerate = 48000 # snd card sample rate for supercollider server
+        self.numOfLayers = 8 
+        self.samplerate = 48000 # snd card sample rate 
         self.pitchLimits = [ 3.0, 1, -1 ] # top, middle of screen and bottom
         self.selection = 0
         self.initRand = 0
@@ -296,15 +318,15 @@ class Slicer(main.App) :
         self.drawOneY = 0
 
         self.constrain = 0, 0, self.size[0], self.size[1]
+        self.remoteControl = False
 
-        # flock
-        self.flock = 0
-        self.followtheflockF = 0.01
-        self.avoidothersF = 0.0003
-        self.matchyrspeedF = 0.001
-        self.followmouse = 0
-##        self.followmouseF = 0.005  
-        self.maxspeed = 7
+##        # flock
+##        self.flock = 0
+##        self.followtheflockF = 0.01
+##        self.avoidothersF = 0.0003
+##        self.matchyrspeedF = 0.001
+##        self.followmouse = 0
+##        self.maxspeed = 7
 
         self.snapshotData = {}
 
@@ -312,34 +334,36 @@ class Slicer(main.App) :
 
         # they already were loaded since they are located in the prefs.tx json file
         # so we just need to set them
-        self.setSlicerPrefs( ) 
+        self.setSlicerPrefs( )
 
-        # trying to load session from prefs.txt
-        if self.session != 0 and self.session != '' : # if a session was specified
-            self.window.frame.filename = utilities.getabspath( self.session )
-##            self.window.frame.filename = os.path.join( utilities.get_cwd(), self.session )
-                
         self.launchAudio()
         
-        self.statusbar = StatusBar(self.width*0.5, self.height-6, 1, self.width+2, 27,
-                                   color=(0.85,0.85,0.85) )
-        
         self.startLayers( self.numOfLayers )
-
-        if self.initRand or self.window.frame.readFile() == -1 :
-            print "---> starting random situation"
-            self.randomSituation() # not session specified
-        
-        self.window.frame.doMenu()
-        self.window.frame.startMenus() # set initial Wx menus status
+        self.startHandlers()
 
         self.setWindowProps() # becausesomething wrong in windows does not set the bgcolor
 
+        # trying to load session from prefs.txt
+        if qtgui.fileName != 0 and qtgui.fileName != None : # if a session was specified
+            filename = utilities.getabspath( qtgui.fileName )
+            qtgui.fileName = utilities.getabspath(filename) #FOR QT
+            print "----> reading session data from file", filename
+            try :
+                rawdata = open(utilities.getabspath(filename), 'rU').read()
+                self.setSession(rawdata)
+            except  IOError :
+                print "ERROR : file %s does not exist" %  filename
 
+        self.doSndList()
+        self.setOSC()
+        print "done init ----------------------"
+
+        
     def launchAudio(self) :
         self.loopers = []
 
         audio.startServer( self.samplerate, self.jack )
+        print "starting audio server: samplerate %s, jack %s" % ( self.samplerate, self.jack )
 
         length, stereo = audio.createTable(self.sndFile)
         
@@ -365,7 +389,7 @@ class Slicer(main.App) :
             print 'starting up, no interface yet'
 
         self.boxList = []
-        self.handles = {}
+##        self.handles = {}
         self.displayList = []
         self.selection = 0
         self.windCircle = 0
@@ -391,6 +415,7 @@ class Slicer(main.App) :
             
             dy += dh+inbetween # y loc for next one
 
+    def startHandlers(self):
         # one black handle
         x,y = self.width, self.height*0.5 # left
         self.handles['black'] = BlackHandle( x,y, 11, 11,11,  (0,0,0, 1)) 
@@ -416,7 +441,6 @@ class Slicer(main.App) :
     def randomSituation(self) :
         self.randomNodes()
         self.randomBoxes()
-        print "-"*15
 
     def randomBoxes(self) :
         for b in self.boxList :
@@ -449,9 +473,11 @@ class Slicer(main.App) :
         if xrange2 > self.width : xrange1 = self.width
         if yrange2 > self.height : yrange1 = self.height
 
-        print xrange1, yrange1, xrange2, yrange2
+##        print xrange1, yrange1, xrange2, yrange2
+         
             
         self.handles[node].loc = utilities.randPoint(xrange1, yrange1, xrange2, yrange2)
+        if node == 'grey': self.handles[node].x = self.width/2
         self.handles[node].updateVars()
         self.handles[node].updateDisplays()
         
@@ -472,44 +498,51 @@ class Slicer(main.App) :
         """ calcs the Y post of the 0 pitch line
         """
         if self.pitchLimits[1] < 0 : #is on top side
-            self.drawZeroY = (self.height*0.5) - ( (self.height*0.5) / (self.pitchLimits[0] + abs(self.pitchLimits[1]))  )  * abs(self.pitchLimits[1])
-            
+            self.drawZeroY = (self.height*0.5) - ( (self.height*0.5) / (self.pitchLimits[0] + abs(self.pitchLimits[1]))  )  * abs(self.pitchLimits[1])        
         else : #is on bottom???
             self.drawZeroY= self.height - ( (self.height*0.5) / (self.pitchLimits[1] + abs(self.pitchLimits[2]))  )  * abs(self.pitchLimits[2])
             
         self.drawOneY = int (self.drawZeroY / self.pitchLimits[0]) * (self.pitchLimits[0] - 1)
 
-        self.compileScreenLines() ## compile again the list
-##        self.drawMinusOneY = self.height -  ((self.height - self.drawZeroY) / self.pitchLimits[0]) * (self.pitchLimits[0] - 1)
-
 
     def loadSnd(self, filename) :
-        self.sndLength, stereo = audio.createTable(filename)
-        if self.sndLength > -1 : 
+        print "loading %s" % filename
+        if os.path.isfile(filename) :
+            self.sndLength, stereo = audio.createTable(filename)
             for p in self.loopers :
                 p.updatetable()
+        else:
+            "%s does not exist" % filename
         self.sndFile = filename # in case it was triggered from menu
 
+    def doSndList(self) :
+        self.sndPool = []    
+        for dirpath, dirnames, fname in os.walk( self.sndPath ) :
+            for f in fname :
+                if f[0] != '.' : # mac .DS_Store and other hidden files
+##                        if dirname[0]  != '.' : # SVN folders on linux and hidden folders in general
+                    self.sndPool.append( os.path.join(dirpath, f) )
+        print self.sndPool
+        
     def resetplayheads(self) :
         for l, d in zip(self.loopers, self.displayList) :
             l.pos = d.calcLimits()[0] # all back to left limit, nomalised to 0-1
         
     def end(self) :
+        closeOSC()
         audio.quitServer()
-
-        
+        super(Slicer, self).end()
+ 
     def step(self) :
-        self.statusbar.text = 'snd: %s | pitch: %s | length:%i | shift: %i | start: %i | granshift: %i | vol: %s | session: %s' \
-                              % (self.sndFile, self.pitch,self.grain,self.shift, self.sttime, self.grainshift, self.vol, self.session )
-        if self.flock :
-            self.massCenter = self.averageCenter()
-            self.flockSpeed = self.averageSpeed()
+        qtgui.status('snd: %s | pitch: %s | length:%i | shift: %i | start: %i | granshift: %i | vol: %s | step: %s | session: %s' \
+                              % (os.path.basename(self.sndFile), self.pitch,self.grain,self.shift,
+                                 self.sttime, self.grainshift, self.vol, self.boxStep,
+                                 os.path.basename(qtgui.fileName) ) )
+##        if self.flock :
+##            self.massCenter = self.averageCenter()
+##            self.flockSpeed = self.averageSpeed()
 
-    def compileScreenLines(self) :
-        glDeleteLists( 9999, 1) # first try to delete it
-        # compile call list  	 
-        glNewList(9999, GL_COMPILE) # unique int id for each list 	 
-
+    def render(self):
         # draw zero line #
         glPushMatrix()
         glTranslatef(self.width2, self.drawZeroY, -999) # translate to GL loc point
@@ -551,17 +584,21 @@ class Slicer(main.App) :
         glDisable(GL_LINE_STIPPLE)
         glPopMatrix()
         
-        glEndList()
-        
-    def render(self) :
-        glCallList(9999) # lines marking 0, 1 pitch and middle screen Height
         
     def setVol(self, n) :
+        if n > 1 : n = 1
+        if n < 0 : n = 0
         self.__vol = n
         for b in self.boxList : b.updateLooper() #; print b.looper.amp
+        print "vol set to %s" % n
     def getVol(self) : return self.__vol
     vol = property(getVol, setVol)
 
+    def volUp(self):
+        self.vol = self.vol + 0.1
+    def volDown(self):
+        self.vol = self.vol - 0.1
+    
     def setPitchL(self, l) :
         n = self.size[1]*0.5 # half the height of the window
         self.__pitchLimits = l # items 0,1,2 (top, midd, bottom)
@@ -580,22 +617,22 @@ class Slicer(main.App) :
             b.delta = b.calcDelta()
             b.updateLooper()
 
-    # flock
-    def averageCenter(self) :
-        x = y = 0
-        for o in self.boxList : 
-            x += o.x
-            y += o.y
-        num = float(len(self.boxList))  # minus me. note float 1.
-        return x/num, y/num 
-
-    def averageSpeed(self) :
-        x = y = 0
-        for o in self.boxList :
-            x += o.delta[0]
-            y += o.delta[1]
-        num =  float(len(self.boxList))  # minus me. Note float 1.
-        return x/num, y/num 
+##    # flock
+##    def averageCenter(self) :
+##        x = y = 0
+##        for o in self.boxList : 
+##            x += o.x
+##            y += o.y
+##        num = float(len(self.boxList))  # minus me. note float 1.
+##        return x/num, y/num 
+##
+##    def averageSpeed(self) :
+##        x = y = 0
+##        for o in self.boxList :
+##            x += o.delta[0]
+##            y += o.delta[1]
+##        num =  float(len(self.boxList))  # minus me. Note float 1.
+##        return x/num, y/num 
 
 
     # joystick and mouse stuff ###########

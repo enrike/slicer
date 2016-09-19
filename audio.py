@@ -17,36 +17,39 @@ table = None
 
 
 def startServer(rate=44100, jack=True,  channels=2):
-        global pyoserver
+    global pyoserver
+    
+    if jack :
+        audio= 'jack'
+    else:
+        audio = 'portaudio'
         
-        if jack :
-            audio= 'jack'
-        else:
-            audio = 'portaudio'
-            
-        if sys.platform == 'win32' :
-                pyoserver = Server(
-                                   sr=rate,
-                                   nchnls=channels,
-                                   duplex=0,
-                                   )
-        else :
-                pyoserver = Server(
-                                   sr=rate,
-                                   nchnls=channels,
-                                   duplex=0,
-                                   audio=audio,
-                                   jackname="Slicer"
-                                   )
-        pyoserver.boot()
-        pyoserver.start()
+    if sys.platform == 'win32' :
+        pyoserver = Server(
+                               sr=rate,
+                               nchnls=channels,
+                               duplex=0,
+                               )
+    else :
+        pyoserver = Server(
+                               sr=rate,
+                               nchnls=channels,
+                               duplex=0,
+                               audio=audio,
+                               jackname="Slicer"
+                               )
+        if audio == 'jack':
+            pyoserver.setJackAuto(False, False)## ERROR in laptop while autoconnecting
+
+    pyoserver.boot()
+    pyoserver.start()
 
 def quitServer() :
-        pyoserver.shutdown()
+    pyoserver.shutdown()
 
 def amp(amp):
-        ''' global amp '''
-        pyoserver.setAmp(amp)
+    ''' global amp '''
+    pyoserver.setAmp(amp)
 
 def recstart() :
     filename = 'slicer_%s_%s_%s_%s_%s_%s.aif' % time.localtime()[:6]
@@ -69,11 +72,11 @@ def createTable( filename ) :
         return -1
     else :
         print 'loading sound file %s' % path
-        try :
-                table = SndTable(path)
-        except :
-                print "error loading sound: cannot handle that format?"
-                return -1
+##        try :
+        table = SndTable(path)
+##        except :
+##                print "error loading sound: cannot handle that format?"
+##                return -1
 
     tabdur = table.getDur()
     print 'length is', tabdur
@@ -98,12 +101,13 @@ class SlicerPlayer(object) :
         print "Am I an stereo player?", stereo
 
         self._pitch = 1
+        # table is global but it could be a class variable
         tabrate = table.getRate() # Return the frequency in cps at which the sound will be read at its original pitch.
         start = 0
 
         self.phasor = Phasor(freq=(self._pitch*tabrate), add=start, mul=1)
         self.pointer = Pointer(table=table, index=self.phasor, mul=1)
-##        self.pointer.mix(1).out(index) #  each channel to one output. for an 8 multichaneel setup
+##        self.pointer.mix(1).out(index) #  each channel to one output. for an 8 multichanel setup
         
         if self.stereo :
             signal = self.pointer
@@ -166,50 +170,50 @@ class SlicerPlayer(object) :
 
 
 if __name__ == '__main__' :
-        
-        import time
-                    
-        startServer(jack=True) #, rate=96000)
-        
-        # mono sound
-        length, stereo = createTable('mono_test.wav')
-        print length, stereo
-        sm = SlicerPlayer(stereo)
+    
+    import time
+                
+    startServer(jack=True) #, rate=96000)
+    
+##        # mono sound
+##        length, stereo = createTable('mono_test.wav')
+##        print length, stereo
+##        sm = SlicerPlayer(stereo)
+##
+##        sm.setPan(0.5) # mono tables
+##        time.sleep(1)
+##        sm.setPan(1) # mono tables
+##        time.sleep(1)
+##        sm.setPan(0) # mono tables
+##        time.sleep(1)
+##
+##        sm.stop()
+##        
+##        # stereo sound
+##        length, stereo = createTable('stereo_test.wav')
+##        print length, stereo
+##        st = SlicerPlayer(stereo)
+##        
+##        st.setPan(0.5)
+##        time.sleep(1)
+##        st.setPan(0) 
+##        time.sleep(1)
+##        st.setPan(1) 
+##        time.sleep(1)
+##
+##        st.stop()
 
-        sm.setPan(0.5) # mono tables
-        time.sleep(1)
-        sm.setPan(1) # mono tables
-        time.sleep(1)
-        sm.setPan(0) # mono tables
-        time.sleep(1)
-
-        sm.stop()
+    # other options
+    length, stereo = createTable('numeros.wav')
+    print length, stereo
+    num= SlicerPlayer(stereo)
+    
+    num.setPitch(0.75)
+    num.setStart(0.2)
+    num.setDur(0.8)
         
-        # stereo sound
-        length, stereo = createTable('stereo_test.wav')
-        print length, stereo
-        st = SlicerPlayer(stereo)
-        
-        st.setPan(0.5)
-        time.sleep(1)
-        st.setPan(0) 
-        time.sleep(1)
-        st.setPan(1) 
-        time.sleep(1)
-
-        st.stop()
-
-        # other options
-        length, stereo = createTable('numeros.wav')
-        print length, stereo
-        num= SlicerPlayer(stereo)
-        
-        num.setPitch(0.75)
-        num.setStart(0.2)
-        num.setDur(0.8)
-            
-        while 1 :
-            time.sleep(0.1)
-            print 'position is', num.pos
+    while 1 :
+        time.sleep(0.1)
+        print 'position is', num.pos
 ##        pyoserver.gui(locals())
         
