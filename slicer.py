@@ -30,6 +30,7 @@ class Slicer(main.App) :
         """ set here the main window properties and characteristics, JUST DEFAUT ONES IN THIS CASE
         """
         self.caption = "Slicer" # window name
+        #self.inversepan = 0
 
         self.readSetUpPrefs()
 
@@ -201,7 +202,7 @@ class Slicer(main.App) :
             print "ERROR parsing json session data"
             return -1
 
-        print 'setting json session', jdata
+        #print 'setting json session', jdata
 
         self.sndFile = str( jdata[ 'sndFile' ] )  #
         self.loadSnd( self.sndFile )
@@ -319,6 +320,7 @@ class Slicer(main.App) :
 
         self.constrain = 0, 0, self.size[0], self.size[1]
         self.remoteControl = False
+        self.inversepan = 0
 
 ##        # flock
 ##        self.flock = 0

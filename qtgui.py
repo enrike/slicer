@@ -147,9 +147,15 @@ def do(mainapp, win):
     )
 
     # FREEDOMS
-    fm = win.menuBar().addMenu("&Freedom")    
+    fm = win.menuBar().addMenu("&Freedom & control")
+    fm.addAction( 
+        QtGui.QAction("I&nverse Panning", win, triggered=inversepan )
+    )
     fm.addAction( 
         QtGui.QAction("T&oggle OSC remote control of handles", win, triggered=app.toggleOSCControl )
+    )
+    fm.addAction( 
+        QtGui.QAction("R&eset OSC connection", win, triggered=app.setOSC )
     )
     fm.addSeparator() #---------
     fm.addAction( 
@@ -238,6 +244,7 @@ def toggleFreedom(degree): app.freedom[ degree ] = not app.freedom[ degree ]
 def volChange(i): app.vol = i/10.0
 def autoNodes(): app.autoNodes = not app.autoNodes
 def bounce(): app.bounce = not app.bounce
+def inversepan(): app.inversepan = not app.inversepan
 def changeAuto(i):
     app.boxStep = app.boxStep + i
     app.updateBoxDelta()

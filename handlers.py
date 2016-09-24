@@ -62,6 +62,7 @@ class SmallBox(SRect) :
 
     def calcPan(self) : # range 0 to 1 for eg.
         pan = self.x/float(self.app.width)
+        if self.app.inversepan: pan = 1-pan 
         if pan < 0 : pan = 0 # limit
         if pan > 1 : pan = 1
         return pan
