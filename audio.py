@@ -2,13 +2,31 @@ import os, time, sys
 from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix#, PVShift
 
 
-if getattr(sys, 'frozen', False):
-    application_path = os.path.dirname(sys.executable)
-else: #if __file__:
-    application_path = os.getcwd() 
+def getabspath(f=''):
+    p = ''
+    print os.getcwd(), f, sys.executable
+    if getattr(sys, 'frozen', False) :
+        if sys.platform == 'darwin' :
+##            p = os.path.join(sys.executable, "../../../", f)
+            p = "/"
+            for st in sys.executable.split("/")[1:-4]:
+                p = os.path.join(p, st)
+            p = os.path.join(p, f)
+        elif sys.platform == "win32":
+            # get the exe directory and append the prefs file name
+            p = os.path.join(sys.executable[:-len(os.path.basename(sys.executable))], f)
+        else :
+            p = os.path.join(os.getcwd(), f)
+    else :
+        p = os.path.join(os.getcwd(), f)
+
+    if not os.path.isfile( p ) :
+        print "file does not exist", p
+
+    return p
 
 
-SNDS_PATH = os.path.join(application_path, 'sounds')
+SNDS_PATH = getabspath('sounds')
 print "SNDS_PATH is ", SNDS_PATH
 
 pyoserver = None
