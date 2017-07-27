@@ -61,6 +61,10 @@ def do(mainapp, win):
     sm.addAction(
         QtGui.QAction("S&ave snapshot As", win, triggered=saveSnapAs)
     )
+    fm.addSeparator() #---------
+    sm.addAction(
+        QtGui.QAction("Toogle load snap mode", win, triggered=app.toogleLoadSnapMode)
+    )
     sm.addSeparator() #---------
     for i in range(10):
         sm.addAction(
@@ -120,6 +124,10 @@ def do(mainapp, win):
     am.addAction( # Random boxes
         QtGui.QAction("R&andom Boxes", win, shortcut="Ctrl+B",
         triggered=app.randomBoxes )
+    )
+    am.addAction( # Random boxes small
+        QtGui.QAction("R&andom step Boxes", win, shortcut="Ctrl+D",
+        triggered=app.randomBoxesSmall )
     )
     am.addAction( # Random all nodes
         QtGui.QAction("R&andom ALL nodes", win, shortcut="Ctrl+N",

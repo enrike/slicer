@@ -37,6 +37,9 @@ class Slicer(main.App) :
     def toggleOSCControl(self):
         self.remoteControl = not self.remoteControl
 
+    def toogleLoadSnapMode(self):
+        self.loadsnapshotboxes = not self.loadsnapshotboxes
+
     def setOSC(self):
         initOSCServer('127.0.1', 9001) # takes args : ip, port, mode --> 0 for basic server, 1 for threading server, 2 for forking server
 
@@ -151,10 +154,11 @@ class Slicer(main.App) :
         
         self.numOfLayers = len( jdata['layers'] )
 
-        for box, d in zip(self.boxList, jdata['layers']) :
-            box.x, box.y, box.looper.pointer.mul = d
-            box.updateLooper() # update
-            box.moveLabel() 
+        if self.loadsnapshotboxes:
+            for box, d in zip(self.boxList, jdata['layers']) :
+                box.x, box.y, box.looper.pointer.mul = d
+                box.updateLooper() # update
+                box.moveLabel() 
  
         self.handles['white'].x, self.handles['white'].y = jdata[ 'nodes' ]['white']
         self.handles['grey'].x, self.handles['grey'].y = jdata[ 'nodes' ]['grey']
@@ -220,6 +224,11 @@ class Slicer(main.App) :
         self.numOfLayers = len( jdata['layers'] )
         self.freedom = jdata[ 'freedom' ]
         self.initRand = jdata[ 'initRand' ]
+
+        try:
+            self.loadsnapshotboxes = jdata[ 'loadsnapshotboxes' ]
+        except:
+            print "no loadsnapshotsboxes in session file"
 
         try :
             self.autoNodes =  jdata[ 'autoNodes' ]
@@ -331,6 +340,7 @@ class Slicer(main.App) :
 ##        self.maxspeed = 7
 
         self.snapshotData = {}
+        self.loadsnapshotboxes = True
 
         ## end declaring variables ############
 
@@ -448,6 +458,12 @@ class Slicer(main.App) :
         for b in self.boxList :
             b.loc = utilities.randPoint(1, 1, self.width, self.height)
             b.updateLooper()
+            b.moveLabel()
+
+    def randomBoxesSmall(self) :
+        for b in self.boxList :
+            b.loc = utilities.randPoint(int(b.x-5), int(b.y-5), int(b.x+5), int(b.y+5))
+            b.updateLooper()
             b.moveLabel() 
             
     def randomNodes(self, flag=0) :
@@ -463,7 +479,7 @@ class Slicer(main.App) :
 
     def randomSingleNode(self, node, mode=0) :
         if mode :
-            # what about this ? http://code.activestate.com/recipes/576760-brownian-motion-of-stock/
+            # what about this ? http://code.activestate.com/recipesy/576760-brownian-motion-of-stock/
             xrange1, xrange2 = int(self.handles[node].x) - 5, int(self.handles[node].x) + 5
             yrange1, yrange2  =  int(self.handles[node].y) - 5, int(self.handles[node].y )+ 5
         else :
