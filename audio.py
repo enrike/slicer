@@ -1,5 +1,5 @@
 import os, time, sys
-from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix#, PVShift
+from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix, Compress #, PVShift
 
 
 def getabspath(f=''):
@@ -135,10 +135,12 @@ class SlicerPlayer(object) :
 
         self.mix = Mix(signal, voices=2, mul=1)
 ##        PVShift(self.mix, shift=500).out()
+##        self.mix = Compress(self.mix, thresh = -14, ratio = 6, risetime = 0.01,
+##                            falltime = 0.2, knee = 0.5)
         self.mix.out()
 
         # poll phasor
-        self.pat = Pattern(function=self.findpos, time=1/12).play()
+        self.pat = Pattern(function=self.findpos, time=1/10).play()
 
     def findpos(self) :
         self.pos = self.phasor.get() # * table.getDur() # position in seconds (.getSize() for samples)
