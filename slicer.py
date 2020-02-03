@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from mirra import main
 from mirra import utilities
 from handlers import *
@@ -7,7 +8,7 @@ from time import localtime
 
 import json
 import os
-from simpleOSC import *
+##from simpleOSC import *
 
 import audio
 import qtgui # QT GUI menus
@@ -34,40 +35,40 @@ class Slicer(main.App) :
 
         self.readSetUpPrefs()
 
-    def toggleOSCControl(self):
-        self.remoteControl = not self.remoteControl
+##    def toggleOSCControl(self):
+##        self.remoteControl = not self.remoteControl
 
     def toogleLoadSnapMode(self):
         self.loadsnapshotboxes = not self.loadsnapshotboxes
 
-    # OSC control nodes
-    def greyJump(self, address, *args):
-        self.handles['grey'].jump(args[1][0], args[1][1])
-
-    def greyPos(self, address, *args):
-        self.handles['grey'].pos(args[1][0], args[1][1])
-
-    def whiteJump(self, address, *args):
-        self.handles['white'].jump(args[1][0], args[1][1])
-
-    def whitePos(self, address, *args):
-        self.handles['white'].pos(args[1][0], args[1][1])
-
-    def blackJump(self, address, *args):
-        self.handles['black'].jump(args[1][0], args[1][1])
-
-    def blackPos(self, address, *args):
-        self.handles['black'].pos(args[1][0], args[1][1])
-        
-    def setOSC(self):
-        initOSCServer('127.0.1', 9001) # takes args : ip, port, mode --> 0 for basic server, 1 for threading server, 2 for forking server
-
-        setOSCHandler('/grey/jump', self.greyJump)
-        setOSCHandler('/grey/pos', self.greyPos)
-        setOSCHandler('/white/jump', self.whiteJump)
-        setOSCHandler('/white/pos', self.whitePos)
-        setOSCHandler('/black/jump', self.blackJump)
-        setOSCHandler('/black/pos', self.blackPos)
+##    # OSC control nodes
+##    def greyJump(self, address, *args):
+##        self.handles['grey'].jump(args[1][0], args[1][1])
+##
+##    def greyPos(self, address, *args):
+##        self.handles['grey'].pos(args[1][0], args[1][1])
+##
+##    def whiteJump(self, address, *args):
+##        self.handles['white'].jump(args[1][0], args[1][1])
+##
+##    def whitePos(self, address, *args):
+##        self.handles['white'].pos(args[1][0], args[1][1])
+##
+##    def blackJump(self, address, *args):
+##        self.handles['black'].jump(args[1][0], args[1][1])
+##
+##    def blackPos(self, address, *args):
+##        self.handles['black'].pos(args[1][0], args[1][1])
+##        
+##    def setOSC(self):
+##        initOSCServer('127.0.1', 9001) # takes args : ip, port, mode --> 0 for basic server, 1 for threading server, 2 for forking server
+##
+##        setOSCHandler('/grey/jump', self.greyJump)
+##        setOSCHandler('/grey/pos', self.greyPos)
+##        setOSCHandler('/white/jump', self.whiteJump)
+##        setOSCHandler('/white/pos', self.whitePos)
+##        setOSCHandler('/black/jump', self.blackJump)
+##        setOSCHandler('/black/pos', self.blackPos)
 
 ##        setOSCHandler('/axis/1',    self.hid_vertical_0)
 ##        setOSCHandler('/axis/0',    self.hid_horizontal_0)
@@ -77,17 +78,17 @@ class Slicer(main.App) :
 ##        setOSCHandler('/buttonDown/2',        self.hid_down_3)
 ##        setOSCHandler('/buttonDown/9',        self.hid_down_9)        
 
-        startOSCServer() # and now set it into action
+##        startOSCServer() # and now set it into action
 
-    # OSC messages to control de handles from HID device
-    def hid_vertical_0(self, addr, tags, data, source):
-        self.handles['black'].delta[1] = data[0] * 2.5
-    def hid_horizontal_0(self, addr, tags, data, source):
-        self.handles['black'].delta[0] = data[0] * 2.5
-    def hid_vertical_1(self, addr, tags, data, source):
-        self.handles['white'].delta[1] = data[0] * 2.5
-    def hid_horizontal_1(self, addr, tags, data, source):
-        self.handles['white'].delta[0] = data[0] * 2.5
+##    # OSC messages to control de handles from HID device
+##    def hid_vertical_0(self, addr, tags, data, source):
+##        self.handles['black'].delta[1] = data[0] * 2.5
+##    def hid_horizontal_0(self, addr, tags, data, source):
+##        self.handles['black'].delta[0] = data[0] * 2.5
+##    def hid_vertical_1(self, addr, tags, data, source):
+##        self.handles['white'].delta[1] = data[0] * 2.5
+##    def hid_horizontal_1(self, addr, tags, data, source):
+##        self.handles['white'].delta[0] = data[0] * 2.5
 
         
     def hid_down_1(self, addr, tags, data, source):
@@ -109,7 +110,7 @@ class Slicer(main.App) :
         """ saves the sesion data as json into a txt file with the time name
         """
         data = self.getSessionJSON()
-        print "save session", filepath
+        print("save session", filepath)
         savedata = open(filepath, 'w')
         savedata.write(str(data))
         savedata.close()
@@ -144,7 +145,7 @@ class Slicer(main.App) :
         data[ 'nodes' ]['white'] = self.handles['white'].x, self.handles['white'].y
         data[ 'nodes' ]['grey'] = self.handles['grey'].x, self.handles['grey'].y
 
-        print "current snapshot", data
+        print("current snapshot", data)
         
         return data
 
@@ -161,7 +162,7 @@ class Slicer(main.App) :
         try :
             jdata = json.loads(rawdata) # json decode
         except :
-            print "ERROR parsing json snapshot data"
+            print("ERROR parsing json snapshot data")
             return -1
 
         self.snapshotData = jdata
@@ -229,7 +230,7 @@ class Slicer(main.App) :
         try :
             jdata = json.loads(rawdata) # json decode
         except :
-            print "ERROR parsing json session data"
+            print("ERROR parsing json session data")
             return -1
 
         #print 'setting json session', jdata
@@ -241,7 +242,7 @@ class Slicer(main.App) :
             self.sndPath = str( jdata[ 'sndPath' ] )
         except :
             self.sndPath = ""
-            print "no sndPath in session file"
+            print("no sndPath in session file")
         
         # **** display changes in GUI menus as well!! *****
         self.microtones = jdata[ 'microtones' ]  
@@ -254,16 +255,16 @@ class Slicer(main.App) :
         try:
             self.loadsnapshotboxes = jdata[ 'loadsnapshotboxes' ]
         except:
-            print "no loadsnapshotsboxes in session file"
+            print("no loadsnapshotsboxes in session file")
 
         try :
             self.autoNodes =  jdata[ 'autoNodes' ]
         except :
-            print "no autoNodes set in this session.. skiping..."
+            print("no autoNodes set in this session.. skiping...")
 
         try:
             if jdata['winSize'] != self.size :
-                print "WARNING: this session works well with a window size of %" % jdata['winSize']
+                print("WARNING: this session works well with a window size of %" % jdata['winSize'])
         except:
             pass # silently skip. for backwards compatibility
             
@@ -292,7 +293,7 @@ class Slicer(main.App) :
             for folder in jdata[ 'sndfolders' ]:
                 qtgui.addFolder(folder)
         except :
-            print "no sndfolders stored in this session.. skiping..."
+            print("no sndfolders stored in this session.. skiping...")
 
     def forceUpdate(self):
         for h in self.handles.values() :
@@ -385,27 +386,27 @@ class Slicer(main.App) :
         if qtgui.fileName != 0 and qtgui.fileName != None : # if a session was specified
             filename = utilities.getabspath( qtgui.fileName )
             qtgui.fileName = utilities.getabspath(filename) #FOR QT
-            print "----> reading session data from file", filename
+            print("----> reading session data from file", filename)
             try :
                 rawdata = open(utilities.getabspath(filename), 'rU').read()
                 self.setSession(rawdata)
             except  IOError :
-                print "ERROR : file %s does not exist" %  filename
+                print("ERROR : file %s does not exist" %  filename)
 
         self.doSndList()
-        self.setOSC()
-        print "done init ----------------------"
+##        self.setOSC()
+        print("done init ----------------------")
 
         
     def launchAudio(self) :
         self.loopers = []
 
         audio.startServer( self.samplerate, self.jack )
-        print "starting audio server: samplerate %s, jack %s" % ( self.samplerate, self.jack )
+        print("starting audio server: samplerate %s, jack %s" % ( self.samplerate, self.jack ))
 
         length, stereo = audio.createTable(self.sndFile)
         
-        for b in xrange( self.numOfLayers ) : #buffers 1000-1007
+        for b in range( self.numOfLayers ) : #buffers 1000-1007
             looper = audio.SlicerPlayer(stereo, b)
             self.loopers.append( looper )        
 
@@ -417,14 +418,14 @@ class Slicer(main.App) :
         """ instantiates basic graphical GUI objects
         """        
         try : # kill all interface all instances
-            print 'restarting interface'
+            print('restarting interface')
             for o in self.boxList : o.end()
             for o in self.handles.values() : o.end() # handles is prop list
             for o in self.displayList : o.end()
             self.selection.end()
             self.windCircle.end()
         except :
-            print 'starting up, no interface yet'
+            print('starting up, no interface yet')
 
         self.boxList = []
 ##        self.handles = {}
@@ -550,7 +551,7 @@ class Slicer(main.App) :
 
 
     def loadSnd(self, filename) :
-        print "loading %s" % filename
+        print("loading %s" % filename)
         if os.path.isfile(filename) :
             self.sndLength, stereo = audio.createTable(filename)
             for p in self.loopers :
@@ -566,14 +567,14 @@ class Slicer(main.App) :
                 if f[0] != '.' : # mac .DS_Store and other hidden files
 ##                        if dirname[0]  != '.' : # SVN folders on linux and hidden folders in general
                     self.sndPool.append( os.path.join(dirpath, f) )
-        print self.sndPool
+        print(self.sndPool)
         
     def resetplayheads(self) :
         for l, d in zip(self.loopers, self.displayList) :
             l.pos = d.calcLimits()[0] # all back to left limit, nomalised to 0-1
         
     def end(self) :
-        closeOSC()
+##        closeOSC()
         audio.quitServer()
         super(Slicer, self).end()
  
@@ -634,7 +635,7 @@ class Slicer(main.App) :
         if n < 0 : n = 0
         self.__vol = n
         for b in self.boxList : b.updateLooper() #; print b.looper.amp
-        print "vol set to %s" % n
+        print("vol set to %s" % n)
     def getVol(self) : return self.__vol
     vol = property(getVol, setVol)
 

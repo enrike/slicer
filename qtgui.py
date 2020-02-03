@@ -1,3 +1,4 @@
+from __future__ import print_function
 from PyQt5 import QtCore, QtWidgets, QtWidgets
 from functools import partial
 import mirra
@@ -84,7 +85,7 @@ def do(mainapp, win):
     vm.addAction( # MUTE
             QtWidgets.QAction("M&ute", win, shortcut="Ctrl+M", triggered= partial(volChange, 0) )
     )
-    for i in xrange(1,11): # 1 to 10
+    for i in range(1,11): # 1 to 10
         n = i
         if n == 10: n = 0 # 10 corresponds to key 0
         vm.addAction( 
@@ -95,7 +96,7 @@ def do(mainapp, win):
     # NOL
     nm = win.menuBar().addMenu("&Num of Layers")
 
-    for i in xrange(1,9):
+    for i in range(1,9):
         nm.addAction(
             QtWidgets.QAction("%s&" % i, win, triggered = partial(app.nol, i))
         )
@@ -159,12 +160,12 @@ def do(mainapp, win):
     fm.addAction( 
         QtWidgets.QAction("I&nverse Panning", win, triggered=inversepan )
     )
-    fm.addAction( 
-        QtWidgets.QAction("T&oggle OSC remote control of handles", win, triggered=app.toggleOSCControl )
-    )
-    fm.addAction( 
-        QtWidgets.QAction("R&eset OSC connection", win, triggered=app.setOSC )
-    )
+##    fm.addAction( 
+##        QtWidgets.QAction("T&oggle OSC remote control of handles", win, triggered=app.toggleOSCControl )
+##    )
+##    fm.addAction( 
+##        QtWidgets.QAction("R&eset OSC connection", win, triggered=app.setOSC )
+##    )
     fm.addSeparator() #---------
     fm.addAction( 
         QtWidgets.QAction("T&oggle pitch block", win, triggered=partial(toggleFreedom, 'pitch') )
@@ -199,7 +200,7 @@ def openFile():
     app.setSession(rawdata)
     
 def save():
-    print fileName
+    print(fileName)
     if fileName == None:
         saveAs()
     else:
@@ -225,7 +226,7 @@ def openSnapFile():
     
 def saveSnap():
     data = app.getSnapshotJSON()
-    print snapName
+    print(snapName)
     if snapName == None:
         saveSnapAs()
     else:
@@ -310,7 +311,7 @@ def doPoolMenu():
             QtWidgets.QAction("&%s" % os.path.basename(f), qtwin, triggered=partial(app.loadSnd, f))
     )  
 
-def clearMenu(): print "this should clear the menu from sounds"
+def clearMenu(): print("this should clear the menu from sounds")
 
 ####################
 

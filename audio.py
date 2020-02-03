@@ -1,10 +1,11 @@
+from __future__ import print_function
 import os, time, sys
 from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix, Compress #, PVShift
 
 
 def getabspath(f=''):
     p = ''
-    print os.getcwd(), f, sys.executable
+    print(os.getcwd(), f, sys.executable)
     if getattr(sys, 'frozen', False) :
         if sys.platform == 'darwin' :
 ##            p = os.path.join(sys.executable, "../../../", f)
@@ -21,9 +22,9 @@ def getabspath(f=''):
         p = os.path.join(os.getcwd(), f)
 
     if not os.path.isdir( p ) :
-        print "file does not exist", p
+        print("file does not exist", p)
     else :
-       print "SNDS_PATH set to", p
+       print("SNDS_PATH set to", p)
 
     return p
 
@@ -87,10 +88,10 @@ def createTable( filename ) :
     path = os.path.join( SNDS_PATH, filename )
     
     if not os.path.isfile(path) :
-        print "Error file %s does not exist" % path
+        print("Error file %s does not exist" % path)
         return -1
     else :
-        print 'loading sound file %s' % path
+        print('loading sound file %s' % path)
 ##        try :
         table = SndTable(path)
 ##        except :
@@ -98,11 +99,11 @@ def createTable( filename ) :
 ##                return -1
 
     tabdur = table.getDur()
-    print 'length is', tabdur
+    print('length is', tabdur)
     
     channels = table.getSize(all=True)
     stereoflag = isinstance(channels, list)        
-    print "stereo?", stereoflag
+    print("stereo?", stereoflag)
     
     return tabdur, stereoflag
 
@@ -117,7 +118,7 @@ class SlicerPlayer(object) :
         self.pos = 0
 ##        self.index= index
         self.stereo = stereo
-        print "Am I an stereo player?", stereo
+        print("Am I an stereo player?", stereo)
 
         self._pitch = 1
         # table is global but it could be a class variable
@@ -226,7 +227,7 @@ if __name__ == '__main__' :
 
     # other options
 ##    length, stereo = createTable('numeros.wav')
-    print length, stereo
+    print(length, stereo)
     
     time.sleep(0.5) # required
     
