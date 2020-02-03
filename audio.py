@@ -20,14 +20,15 @@ def getabspath(f=''):
     else :
         p = os.path.join(os.getcwd(), f)
 
-    if not os.path.isfile( p ) :
+    if not os.path.isdir( p ) :
         print "file does not exist", p
+    else :
+       print "SNDS_PATH set to", p
 
     return p
 
 
 SNDS_PATH = getabspath('sounds')
-print "SNDS_PATH is ", SNDS_PATH
 
 pyoserver = None
 table = None
@@ -40,7 +41,7 @@ def startServer(rate=44100, jack=True,  channels=2):
     if jack :
         audio= 'jack'
     else:
-        audio = 'portaudio'
+        audio = 'portaudio' # alsa?
         
     if sys.platform == 'win32' :
         pyoserver = Server(
@@ -56,10 +57,10 @@ def startServer(rate=44100, jack=True,  channels=2):
                                audio=audio,
                                jackname="Slicer"
                                )
-        if audio == 'jack':
-            pyoserver.setJackAuto(False, False)## ERROR in laptop while autoconnecting
+    if audio == 'jack':
+        pyoserver.setJackAuto(False, False)## ERROR in laptop while autoconnecting
 
-    pyoserver.boot()
+    pyoserver.boot() 
     pyoserver.start()
 
 def quitServer() :
@@ -114,7 +115,7 @@ class SlicerPlayer(object) :
     def __init__(self, stereo=False, index=0) :
         self._storedmul= None
         self.pos = 0
-        self.index= index
+##        self.index= index
         self.stereo = stereo
         print "Am I an stereo player?", stereo
 
@@ -140,10 +141,10 @@ class SlicerPlayer(object) :
         self.mix.out()
 
         # poll phasor
-        self.pat = Pattern(function=self.findpos, time=1/10).play()
+        self.pat = Pattern(function=self.findpos, time=1/10.0).play()
 
     def findpos(self) :
-        self.pos = self.phasor.get() # * table.getDur() # position in seconds (.getSize() for samples)
+        self.pos = self.phasor.get() 
 
     def setPitch(self, n) :
         self._pitch = n # store
@@ -163,7 +164,7 @@ class SlicerPlayer(object) :
             self.pan.pan = n
         
     def gomute(self, flag) :
-        if flag : # go mute
+        if flag : 
             self._storedmul = self.pointer.mul
             self.mix.mul = 0
         else :
@@ -210,7 +211,7 @@ if __name__ == '__main__' :
 ##        sm.stop()
 ##        
 ##        # stereo sound
-##        length, stereo = createTable('stereo_test.wav')
+    length, stereo = createTable('stereo_test.wav')
 ##        print length, stereo
 ##        st = SlicerPlayer(stereo)
 ##        
@@ -224,16 +225,31 @@ if __name__ == '__main__' :
 ##        st.stop()
 
     # other options
-    length, stereo = createTable('numeros.wav')
+##    length, stereo = createTable('numeros.wav')
     print length, stereo
-    num= SlicerPlayer(stereo)
     
-    num.setPitch(0.75)
-    num.setStart(0.2)
-    num.setDur(0.8)
+    time.sleep(0.5) # required
+    
+    num= SlicerPlayer(stereo)
+##    b= SlicerPlayer(stereo)
+##    num.setPitch(0.75)
+##    num.setStart(0.2)
+##    num.setDur(0.8)
+    
+    import random
+    seed = random.Random()
+
+##    ps = []
+##    for i in xrange(2):
+##        ps.append( SlicerPlayer(stereo) )
+##        ps[i].setPitch(0.75)
+##        ps[i].setStart(seed.random())
+##        ps[i].setDur(seed.random())
+##        ps[i].vol(0.1)
+        
         
     while 1 :
         time.sleep(0.1)
-        print 'position is', num.pos
-##        pyoserver.gui(locals())
+##        print 'position is', num.pos
+        pyoserver.gui(locals())
         

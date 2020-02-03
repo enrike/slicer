@@ -319,7 +319,11 @@ class HandleBase(Rect) :
         if self.app.remoteControl: 
             self.drag(self.loc[0] + self.delta[0], self.loc[1] + self.delta[1])
         
+    def jump(self, x, y):
+        self.drag(self.x+x, self.y+y)
 
+    def pos(self, x, y):
+        self.drag(x,y)
 
 
 class GreyHandle(HandleBase) :

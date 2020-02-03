@@ -14,9 +14,9 @@ import qtgui # QT GUI menus
 
 
 
-""" slicer. python interface connected to a supercollider scsyndef
+""" slicer
 http://www.ixi-software.net
-cLicense : GPL ->  Read doc/documentation.html
+License : GPL ->  Read doc/documentation.html
 """
 
 
@@ -40,17 +40,43 @@ class Slicer(main.App) :
     def toogleLoadSnapMode(self):
         self.loadsnapshotboxes = not self.loadsnapshotboxes
 
+    # OSC control nodes
+    def greyJump(self, address, *args):
+        self.handles['grey'].jump(args[1][0], args[1][1])
+
+    def greyPos(self, address, *args):
+        self.handles['grey'].pos(args[1][0], args[1][1])
+
+    def whiteJump(self, address, *args):
+        self.handles['white'].jump(args[1][0], args[1][1])
+
+    def whitePos(self, address, *args):
+        self.handles['white'].pos(args[1][0], args[1][1])
+
+    def blackJump(self, address, *args):
+        self.handles['black'].jump(args[1][0], args[1][1])
+
+    def blackPos(self, address, *args):
+        self.handles['black'].pos(args[1][0], args[1][1])
+        
     def setOSC(self):
         initOSCServer('127.0.1', 9001) # takes args : ip, port, mode --> 0 for basic server, 1 for threading server, 2 for forking server
 
-        setOSCHandler('/axis/1',    self.hid_vertical_0)
-        setOSCHandler('/axis/0',    self.hid_horizontal_0)
-        setOSCHandler('/axis/3',    self.hid_vertical_1)
-        setOSCHandler('/axis/2',    self.hid_horizontal_1)
-        setOSCHandler('/buttonDown/0',        self.hid_down_1)
-        setOSCHandler('/buttonDown/2',        self.hid_down_3)
-        setOSCHandler('/buttonDown/9',        self.hid_down_9)
-        
+        setOSCHandler('/grey/jump', self.greyJump)
+        setOSCHandler('/grey/pos', self.greyPos)
+        setOSCHandler('/white/jump', self.whiteJump)
+        setOSCHandler('/white/pos', self.whitePos)
+        setOSCHandler('/black/jump', self.blackJump)
+        setOSCHandler('/black/pos', self.blackPos)
+
+##        setOSCHandler('/axis/1',    self.hid_vertical_0)
+##        setOSCHandler('/axis/0',    self.hid_horizontal_0)
+##        setOSCHandler('/axis/3',    self.hid_vertical_1)
+##        setOSCHandler('/axis/2',    self.hid_horizontal_1)
+##        setOSCHandler('/buttonDown/0',        self.hid_down_1)
+##        setOSCHandler('/buttonDown/2',        self.hid_down_3)
+##        setOSCHandler('/buttonDown/9',        self.hid_down_9)        
+
         startOSCServer() # and now set it into action
 
     # OSC messages to control de handles from HID device

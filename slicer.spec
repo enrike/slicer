@@ -14,4 +14,4 @@ exe = EXE(pyz,
           debug=True,
           strip=None,
           upx=True,
-          console=True , icon='dataixi_transp.ico')
+          console=True , icon='data/ixi_transp.ico')
