@@ -189,7 +189,7 @@ def do(mainapp, win):
 def openFile():
     global fileName
     
-    fileName = str( QtWidgets.QFileDialog.getOpenFileName(qtwin, 'OpenFile', sessions, "Session files (*.txt)") )
+    fileName = str( QtWidgets.QFileDialog.getOpenFileName(qtwin, 'OpenFile', sessions, "Session files (*.txt)")[0] )
     if fileName == '' or not fileName: return -1
     try :
         rawdata = open(fileName, 'rU').read()
@@ -208,13 +208,13 @@ def save():
 
 def saveAs():
     global fileName
-    fileName = str( QtWidgets.QFileDialog.getSaveFileName(qtwin, 'Save As', sessions) )
+    fileName = str( QtWidgets.QFileDialog.getSaveFileName(qtwin, 'Save As', sessions)[0] )
     app.saveSession(fileName) 
 
 ####################
 def openSnapFile():
     global snapName
-    snapName = str( QtWidgets.QFileDialog.getOpenFileName(qtwin, 'OpenFile', snapshots, "Snapshot files (*.txt)") )
+    snapName = str( QtWidgets.QFileDialog.getOpenFileName(qtwin, 'OpenFile', snapshots, "Snapshot files (*.txt)")[0] )
     if snapName == '' or not snapName: return -1
     try :
         rawdata = open(snapName, 'rU').read()
@@ -236,7 +236,7 @@ def saveSnap():
     
 def saveSnapAs():
     global snapName
-    snapName = str( QtWidgets.QFileDialog.getSaveFileName(qtwin, 'Save As', snapshots) )
+    snapName = str( QtWidgets.QFileDialog.getSaveFileName(qtwin, 'Save As', snapshots)[0])
     if snapName == '' or not snapName: return -1
     saveSnap()
 
@@ -261,7 +261,7 @@ def changeAuto(i):
 def addSnd():
     init = os.path.basename(fileName)
     sndfiles = QtWidgets.QFileDialog.getOpenFileNames( qtwin,'Open Sound File', init,
-                                                   "WAV (*.wav);;FLAC (*.flac);;AIFF (*.aiff);;MP3 (*.mp3)")
+                                                   "WAV (*.wav);;FLAC (*.flac);;AIFF (*.aiff);;MP3 (*.mp3)")[0]
     for fil in sndfiles:
         fil = str(fil)
         if fil == '' or not fil: return -1
@@ -275,7 +275,7 @@ def addFolder(path=False):
     if path == False:
         init = os.path.basename(fileName)
         path = QtWidgets.QFileDialog.getExistingDirectory(None, 'Select a folder:', init,
-                                                      QtWidgets.QFileDialog.ShowDirsOnly)
+                                                      QtWidgets.QFileDialog.ShowDirsOnly)[0]
     # TO DO: THIS dialogue should allow to see the files. otherwise we dont know whats in the dirs
     if os.path.isfile(path): # if selected a file
         path = os.path.dirname(path)

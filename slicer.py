@@ -388,7 +388,7 @@ class Slicer(main.App) :
             qtgui.fileName = utilities.getabspath(filename) #FOR QT
             print("----> reading session data from file", filename)
             try :
-                rawdata = open(utilities.getabspath(filename), 'rU').read()
+                rawdata = open(utilities.getabspath(filename), 'tr').read()
                 self.setSession(rawdata)
             except  IOError :
                 print("ERROR : file %s does not exist" %  filename)
