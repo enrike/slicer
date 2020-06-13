@@ -8,7 +8,8 @@ from time import localtime
 
 import json
 import os
-##from simpleOSC import *
+
+from pyo import OscDataReceive, RawMidi
 
 import audio
 import qtgui # QT GUI menus
@@ -60,7 +61,9 @@ class Slicer(main.App) :
 ##    def blackPos(self, address, *args):
 ##        self.handles['black'].pos(args[1][0], args[1][1])
 ##        
-##    def setOSC(self):
+    def setOSC(self):
+        OscDataReceive(port=9001, address='/grey/jump', function=self.greyJump)
+        
 ##        initOSCServer('127.0.1', 9001) # takes args : ip, port, mode --> 0 for basic server, 1 for threading server, 2 for forking server
 ##
 ##        setOSCHandler('/grey/jump', self.greyJump)
@@ -90,6 +93,11 @@ class Slicer(main.App) :
 ##    def hid_horizontal_1(self, addr, tags, data, source):
 ##        self.handles['white'].delta[0] = data[0] * 2.5
 
+# MIDI
+    def midievent(self, status, channel, value):
+        print("midi", channel, value)
+        if channel==16:
+            print(value)
         
     def hid_down_1(self, addr, tags, data, source):
         self.randomSingleNode('white', 1)
@@ -309,9 +317,9 @@ class Slicer(main.App) :
 ## initialisation stuff ##########################################
         
     def start(self) :
-        """ genral application startup
+        """ general application startup
         define properties, read prefs, open audio engine and init audio, create all objects,
-        init Wx interface.
+        init qt interface.
         """
         qtgui.do(self, self.window)
 
@@ -376,7 +384,7 @@ class Slicer(main.App) :
         self.setSlicerPrefs( )
 
         self.launchAudio()
-        
+
         self.startLayers( self.numOfLayers )
         self.startHandlers()
 
@@ -395,6 +403,7 @@ class Slicer(main.App) :
 
         self.doSndList()
 ##        self.setOSC()
+        RawMidi(self.midievent)
         print("done init ----------------------")
 
         
@@ -403,14 +412,39 @@ class Slicer(main.App) :
 
         audio.startServer( self.samplerate, self.jack )
         print("starting audio server: samplerate %s, jack %s" % ( self.samplerate, self.jack ))
-
+        self.loadSnd(self.sndFile)
         length, stereo = audio.createTable(self.sndFile)
-        
+
         for b in range( self.numOfLayers ) : #buffers 1000-1007
             looper = audio.SlicerPlayer(stereo, b)
-            self.loopers.append( looper )        
+            looper.vol(0)
+            self.loopers.append( looper )
+        print("done lauching audio server")
 
-            
+
+    def loadSnd(self, filename) : # from launchAudio and from setSession        
+        self.sndFile = filename # in case it was triggered from menu
+
+        self.sndLength, stereo = audio.createTable(filename)
+        for p in self.loopers :
+            p.updatetable()
+        
+##        print("going OFF", len(self.loopers))
+##        for p in self.loopers : #GO OFF
+##            del p
+##        del self.loopers
+##        self.loopers = []
+##        print(len(self.loopers), filename, os.path.isfile(self.sndFile))
+##
+##        length, stereo = audio.createTable(self.sndFile)
+##
+##        for b in range( self.numOfLayers ) : #buffers 1000-1007
+##            looper = audio.SlicerPlayer(stereo, b)
+##            looper.vol(0)
+##            looper.updatetable()
+##            self.loopers.append( looper )
+##            
+##        print(len(self.loopers))
         ################
             
 
@@ -548,17 +582,6 @@ class Slicer(main.App) :
             self.drawZeroY= self.height - ( (self.height*0.5) / (self.pitchLimits[1] + abs(self.pitchLimits[2]))  )  * abs(self.pitchLimits[2])
             
         self.drawOneY = int (self.drawZeroY / self.pitchLimits[0]) * (self.pitchLimits[0] - 1)
-
-
-    def loadSnd(self, filename) :
-        print("loading %s" % filename)
-        if os.path.isfile(filename) :
-            self.sndLength, stereo = audio.createTable(filename)
-            for p in self.loopers :
-                p.updatetable()
-        else:
-            "%s does not exist" % filename
-        self.sndFile = filename # in case it was triggered from menu
 
     def doSndList(self) :
         self.sndPool = []    

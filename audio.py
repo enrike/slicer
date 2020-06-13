@@ -1,6 +1,6 @@
 from __future__ import print_function
 import os, time, sys
-from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix, Compress #, PVShift
+from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix, Compress, pm_list_devices #, PVShift
 
 
 def getabspath(f=''):
@@ -36,6 +36,8 @@ table = None
 
 
 
+
+
 def startServer(rate=44100, jack=True,  channels=2):
     global pyoserver
     
@@ -59,11 +61,15 @@ def startServer(rate=44100, jack=True,  channels=2):
                                jackname="Slicer"
                                )
     if audio == 'jack':
-        pyoserver.setJackAuto(False, False)## ERROR in laptop while autoconnecting
+        pyoserver.setJackAuto(True, True) ## False it if error while autoconnecting
+
+    pyoserver.setMidiInputDevice(99) # connect ALL MIDI devices
 
     pyoserver.boot() 
     pyoserver.start()
-
+    # pyoserver.gui(locals())
+    #pm_list_devices()
+    
 def quitServer() :
     pyoserver.shutdown()
 
@@ -193,8 +199,10 @@ class SlicerPlayer(object) :
 
 if __name__ == '__main__' :
     
-    import time
-                
+    import time, os.path
+
+    print(SNDS_PATH)    
+
     startServer(jack=True) #, rate=96000)
     
 ##        # mono sound
@@ -212,7 +220,7 @@ if __name__ == '__main__' :
 ##        sm.stop()
 ##        
 ##        # stereo sound
-    length, stereo = createTable('stereo_test.wav')
+    length, stereo = createTable('numeros.wav')
 ##        print length, stereo
 ##        st = SlicerPlayer(stereo)
 ##        
@@ -224,29 +232,47 @@ if __name__ == '__main__' :
 ##        time.sleep(1)
 ##
 ##        st.stop()
+    
+##    time.sleep(0.5) # required?
+##    
+##    num = SlicerPlayer(stereo)
+####    b= SlicerPlayer(stereo)
+####    num.setPitch(0.75)
+####    num.setStart(0.2)
+####    num.setDur(0.8)
+##
+##    time.sleep(2)
+####    num.vol=0
+####    num.setPitch(0)
+##    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
+##
+##    print(length, stereo)
+##    num.updatetable()
+##    print("updated table")
+####    num.vol(1)
+##    num.setPitch(1)
 
-    # other options
-##    length, stereo = createTable('numeros.wav')
-    print(length, stereo)
-    
-    time.sleep(0.5) # required
-    
-    num= SlicerPlayer(stereo)
-##    b= SlicerPlayer(stereo)
-##    num.setPitch(0.75)
-##    num.setStart(0.2)
-##    num.setDur(0.8)
-    
+        
     import random
     seed = random.Random()
-
-##    ps = []
-##    for i in xrange(2):
-##        ps.append( SlicerPlayer(stereo) )
+    ps = []
+    for i in range(2):
+        ps.append( SlicerPlayer(stereo) )
 ##        ps[i].setPitch(0.75)
 ##        ps[i].setStart(seed.random())
 ##        ps[i].setDur(seed.random())
-##        ps[i].vol(0.1)
+        ps[i].vol(0.1)
+
+    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
+    for p in ps: p.updatetable()
+
+    time.sleep(3)
+    length, stereo = createTable('numeros.wav')
+    for p in ps: p.updatetable()
+
+    time.sleep(3)
+    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
+    for p in ps: p.updatetable()
         
         
     while 1 :

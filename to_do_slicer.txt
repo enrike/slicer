@@ -1,3 +1,7 @@
+THIS FILE IS OUTDATED
+
+
+
 - compressor to ease the amp drops when random box position changes dramatically
 - limit boxes wandering to a certain area (rect)
 
@@ -140,6 +144,7 @@ drag n drop on window?
 
 mirra to do:
 setMouseVisible in wxpython
+
 
 
 
