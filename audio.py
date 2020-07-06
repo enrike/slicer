@@ -1,7 +1,6 @@
 from __future__ import print_function
 import os, time, sys
-from pyo import SNDS_PATH, Phasor, Pointer, SPan, SndTable, Server, Pattern, Mix, Compress, pm_list_devices #, PVShift
-
+from pyo64 import SNDS_PATH, Phasor, Pointer2, SPan, SndTable, Server, Pattern, Mix, Compress, pm_list_devices #, PVShift
 
 def getabspath(f=''):
     p = ''
@@ -33,6 +32,7 @@ SNDS_PATH = getabspath('sounds')
 
 pyoserver = None
 table = None
+tabrate = None
 
 
 
@@ -90,7 +90,9 @@ def recstop() :
 ##    recstop()
         
 def createTable( filename ) :
-    global table
+    global table,tabrate
+    table = tabrate = None
+    
     path = os.path.join( SNDS_PATH, filename )
     
     if not os.path.isfile(path) :
@@ -98,7 +100,7 @@ def createTable( filename ) :
         return -1
     else :
         print('loading sound file %s' % path)
-##        try :
+##        try
         table = SndTable(path)
 ##        except :
 ##                print "error loading sound: cannot handle that format?"
@@ -106,6 +108,8 @@ def createTable( filename ) :
 
     tabdur = table.getDur()
     print('length is', tabdur)
+    tabrate = table.getRate()
+    print('rate is', tabrate)
     
     channels = table.getSize(all=True)
     stereoflag = isinstance(channels, list)        
@@ -128,11 +132,11 @@ class SlicerPlayer(object) :
 
         self._pitch = 1
         # table is global but it could be a class variable
-        tabrate = table.getRate() # Return the frequency in cps at which the sound will be read at its original pitch.
+##        tabrate = table.getRate() # Return the frequency in cps at which the sound will be read at its original pitch.
         start = 0
 
         self.phasor = Phasor(freq=(self._pitch*tabrate), add=start, mul=1)
-        self.pointer = Pointer(table=table, index=self.phasor, mul=1)
+        self.pointer = Pointer2(table=table, index=self.phasor, autosmooth=True, mul=1)
 ##        self.pointer.mix(1).out(index) #  each channel to one output. for an 8 multichanel setup
         
         if self.stereo :
@@ -185,11 +189,12 @@ class SlicerPlayer(object) :
             self.mix.mul = n # directly
 
     def updatetable(self) :
-        self.pointer.table = table
+        self.pointer.setTable(table)
         self.setPitch(self._pitch)
 
     def stop(self):
         self.pointer.stop()
+
             
         
         
@@ -204,6 +209,16 @@ if __name__ == '__main__' :
     print(SNDS_PATH)    
 
     startServer(jack=True) #, rate=96000)
+
+    length, stereo = createTable("/home/r2d2/Mahaigaina/audio/feedback/SC_200609_170025_comp.flac")
+    num = SlicerPlayer(stereo)
+####    b= SlicerPlayer(stereo)
+    num.setPitch(1.2)
+##    num.setStart(0.2)
+##    num.setDur(0.005)
+    num.vol(0.1)
+
+    while 1: pass
     
 ##        # mono sound
 ##        length, stereo = createTable('mono_test.wav')
@@ -235,11 +250,11 @@ if __name__ == '__main__' :
     
 ##    time.sleep(0.5) # required?
 ##    
-##    num = SlicerPlayer(stereo)
+    num = SlicerPlayer(stereo)
 ####    b= SlicerPlayer(stereo)
-####    num.setPitch(0.75)
-####    num.setStart(0.2)
-####    num.setDur(0.8)
+    num.setPitch(1)
+    num.setStart(0.2)
+    num.setDur(0.8)
 ##
 ##    time.sleep(2)
 ####    num.vol=0
@@ -249,34 +264,34 @@ if __name__ == '__main__' :
 ##    print(length, stereo)
 ##    num.updatetable()
 ##    print("updated table")
-####    num.vol(1)
+    num.vol(0.1)
 ##    num.setPitch(1)
 
         
-    import random
-    seed = random.Random()
-    ps = []
-    for i in range(2):
-        ps.append( SlicerPlayer(stereo) )
+##    import random
+##    seed = random.Random()
+##    ps = []
+##    for i in range(2):
+##        ps.append( SlicerPlayer(stereo) )
 ##        ps[i].setPitch(0.75)
 ##        ps[i].setStart(seed.random())
 ##        ps[i].setDur(seed.random())
-        ps[i].vol(0.1)
+##        ps[i].vol(0.1)
 
-    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
-    for p in ps: p.updatetable()
+##    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
+##    for p in ps: p.updatetable()
 
-    time.sleep(3)
-    length, stereo = createTable('numeros.wav')
-    for p in ps: p.updatetable()
+##    time.sleep(3)
+##    length, stereo = createTable('numeros.wav')
+##    for p in ps: p.updatetable()
 
-    time.sleep(3)
-    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
-    for p in ps: p.updatetable()
+##    time.sleep(3)
+##    length, stereo = createTable("/home/r2d2/.local/share/SuperCollider/Recordings/SC_200330_173134.flac")
+##    for p in ps: p.updatetable()
         
         
     while 1 :
         time.sleep(0.1)
-##        print 'position is', num.pos
-        pyoserver.gui(locals())
+        print('position is', num.getpos() )
+##        pyoserver.gui(locals())
         
