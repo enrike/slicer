@@ -21,7 +21,7 @@ def getabspath(f=''):
         p = os.path.join(os.getcwd(), f)
 
     if not os.path.isdir( p ) :
-        print("file does not exist", p)
+        print("dir does not exist", p)
     else :
        print("SNDS_PATH set to", p)
 
@@ -31,8 +31,9 @@ def getabspath(f=''):
 SNDS_PATH = getabspath('sounds')
 
 pyoserver = None
-table = None
+table = "" #filename used to access tables dict
 tabrate = None
+tables = {}
 
 
 
@@ -89,29 +90,32 @@ def recstop() :
 ##        user's home directory if a path is not supplied.
 ##    recstop()
         
-def createTable( filename ) :
-    global table,tabrate
-    table = tabrate = None
-    
-    path = os.path.join( SNDS_PATH, filename )
-    
-    if not os.path.isfile(path) :
-        print("Error file %s does not exist" % path)
-        return -1
-    else :
-        print('loading sound file %s' % path)
-##        try
-        table = SndTable(path)
-##        except :
-##                print "error loading sound: cannot handle that format?"
-##                return -1
+def createTable( filepath ) :
+    global table,tabrate, tables
+    table = filepath.split(os.sep)[-1] #filename to access sound dict
+    tabrate = None
 
-    tabdur = table.getDur()
+    if tables.get(table) == None: # not there already
+        path = os.path.join( SNDS_PATH, filepath )
+        
+        if not os.path.isfile(path) :
+            print("Error file %s does not exist" % path)
+            return -1
+        else :
+            print('loading sound file %s' % path)
+    ##        try
+            tables[table] = SndTable(path)
+    ##        except :
+    ##                print "error loading sound: cannot handle that format?"
+    ##                return -1   
+        
+
+    tabdur = tables[table].getDur()
     print('length is', tabdur)
-    tabrate = table.getRate()
+    tabrate = tables[table].getRate()
     print('rate is', tabrate)
     
-    channels = table.getSize(all=True)
+    channels = tables[table].getSize(all=True)
     stereoflag = isinstance(channels, list)        
     print("stereo?", stereoflag)
     
@@ -136,7 +140,7 @@ class SlicerPlayer(object) :
         start = 0
 
         self.phasor = Phasor(freq=(self._pitch*tabrate), add=start, mul=1)
-        self.pointer = Pointer2(table=table, index=self.phasor, autosmooth=True, mul=1)
+        self.pointer = Pointer2(table=tables[table], index=self.phasor, autosmooth=True, mul=1)
 ##        self.pointer.mix(1).out(index) #  each channel to one output. for an 8 multichanel setup
         
         if self.stereo :
@@ -159,10 +163,10 @@ class SlicerPlayer(object) :
 
     def setPitch(self, n) :
         self._pitch = n # store
-        self.phasor.freq = (n * table.getRate()) / self.phasor.mul
+        self.phasor.freq = (n * tables[table].getRate()) / self.phasor.mul
 
     def setDur(self, n) :
-        self.phasor.freq = (self._pitch * table.getRate()) / n
+        self.phasor.freq = (self._pitch * tables[table].getRate()) / n
         self.phasor.mul = n
 
     def setStart(self, n) :
@@ -189,7 +193,7 @@ class SlicerPlayer(object) :
             self.mix.mul = n # directly
 
     def updatetable(self) :
-        self.pointer.setTable(table)
+        self.pointer.setTable(tables[table])
         self.setPitch(self._pitch)
 
     def stop(self):
