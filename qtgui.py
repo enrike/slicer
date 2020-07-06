@@ -261,7 +261,7 @@ def changeAuto(i):
 def addSnd():
     init = os.path.basename(fileName)
     sndfiles = QtWidgets.QFileDialog.getOpenFileNames( qtwin,'Open Sound File', init,
-                                                   "WAV (*.wav);;FLAC (*.flac);;AIFF (*.aiff);;MP3 (*.mp3)")[0]
+                                                   "WAV (*.wav);;FLAC (*.flac);;AIFF (*.aiff)")[0]
     for fil in sndfiles:
         fil = str(fil)
         if fil == '' or not fil: return -1
@@ -283,7 +283,7 @@ def addFolder(path=False):
     for root, dirs, files in os.walk( str(path) ) :
         for s in files :
             fpath = os.path.join(root, s)
-            if '.wav' in s or '.flac' in s or '.aiff' in s: ## filter no sounds
+            if '.wav' in s or '.flac' in s or '.aiff' in s: ## filter out no sounds
                 poolMenu.addAction( 
                     QtWidgets.QAction("&%s" % s, qtwin,triggered=partial(app.loadSnd, fpath))
              )
@@ -293,8 +293,11 @@ def addFolder(path=False):
 
 def doPoolMenu():
     global poolMenu
-##    qtwin.removeMenu(poolMenu)
-    poolMenu = qtwin.menuBar().addMenu("&SoundPool")       
+    print("rebuilding sound pool menu")
+    
+    if not poolMenu:    
+        poolMenu = qtwin.menuBar().addMenu("&SoundPool")
+        
     poolMenu.addAction(
             QtWidgets.QAction("A&dd sound to pool", qtwin, triggered=addSnd)
     )
@@ -305,13 +308,17 @@ def doPoolMenu():
             QtWidgets.QAction("C&LEAR pool", qtwin, triggered=clearMenu)
     )
     poolMenu.addSeparator() #---------
+
     filePool = doSndMenu()
+    
     for f in filePool :
         poolMenu.addAction( 
             QtWidgets.QAction("&%s" % os.path.basename(f), qtwin, triggered=partial(app.loadSnd, f))
     )  
 
-def clearMenu(): print("this should clear the menu from sounds")
+def clearMenu():
+    poolMenu.clear()
+    doPoolMenu()
 
 ####################
 
