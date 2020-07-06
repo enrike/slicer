@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+##from __future__ import print_function
 from mirra import main
 from mirra import utilities
 from handlers import *
-from time import localtime
 
+from time import sleep
 import json
 import os
 
@@ -381,7 +381,7 @@ class Slicer(main.App) :
 
         # they already were loaded since they are located in the prefs.tx json file
         # so we just need to set them
-        self.setSlicerPrefs( )
+        self.setSlicerPrefs( ) # general window prefs
 
         self.launchAudio()
 
@@ -412,7 +412,8 @@ class Slicer(main.App) :
 
         audio.startServer( self.samplerate, self.jack )
         print("starting audio server: samplerate %s, jack %s" % ( self.samplerate, self.jack ))
-        self.loadSnd(self.sndFile)
+##        self.loadSnd(self.sndFile)
+        audio.amp(0)
         length, stereo = audio.createTable(self.sndFile)
 
         for b in range( self.numOfLayers ) : #buffers 1000-1007
@@ -420,32 +421,16 @@ class Slicer(main.App) :
             looper.vol(0)
             self.loopers.append( looper )
         print("done lauching audio server")
+        audio.amp(self.vol)
 
 
     def loadSnd(self, filename) : # from launchAudio and from setSession        
         self.sndFile = filename # in case it was triggered from menu
-
+        audio.amp(0)
         self.sndLength, stereo = audio.createTable(filename)
         for p in self.loopers :
             p.updatetable()
-        
-##        print("going OFF", len(self.loopers))
-##        for p in self.loopers : #GO OFF
-##            del p
-##        del self.loopers
-##        self.loopers = []
-##        print(len(self.loopers), filename, os.path.isfile(self.sndFile))
-##
-##        length, stereo = audio.createTable(self.sndFile)
-##
-##        for b in range( self.numOfLayers ) : #buffers 1000-1007
-##            looper = audio.SlicerPlayer(stereo, b)
-##            looper.vol(0)
-##            looper.updatetable()
-##            self.loopers.append( looper )
-##            
-##        print(len(self.loopers))
-        ################
+        audio.amp(self.vol)
             
 
     def startLayers(self, n, reset=1) :
@@ -551,10 +536,7 @@ class Slicer(main.App) :
         if yrange1 < 1 : yrange1 = 1
         if xrange2 > self.width : xrange1 = self.width
         if yrange2 > self.height : yrange1 = self.height
-
-##        print xrange1, yrange1, xrange2, yrange2
-         
-            
+        
         self.handles[node].loc = utilities.randPoint(xrange1, yrange1, xrange2, yrange2)
         if node == 'grey': self.handles[node].x = self.width/2
         self.handles[node].updateVars()
