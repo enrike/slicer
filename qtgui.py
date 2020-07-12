@@ -48,6 +48,10 @@ def do(mainapp, win):
     )
     fm.addSeparator() #---------
     fm.addAction(
+        QtWidgets.QAction("D&raw waveform", win, shortcut="Ctrl+F", triggered=setDrawWave)
+    )
+    fm.addSeparator() #---------
+    fm.addAction(
         QtWidgets.QAction("E&xit", win, shortcut="Ctrl+Q", triggered=app.end)
     )
     
@@ -209,7 +213,10 @@ def save():
 def saveAs():
     global fileName
     fileName = str( QtWidgets.QFileDialog.getSaveFileName(qtwin, 'Save As', sessions)[0] )
-    app.saveSession(fileName) 
+    app.saveSession(fileName)
+
+def setDrawWave():
+    app.setDrawWave()
 
 ####################
 def openSnapFile():

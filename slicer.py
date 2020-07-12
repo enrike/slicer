@@ -377,6 +377,9 @@ class Slicer(main.App) :
         self.snapshotData = {}
         self.loadsnapshotboxes = True
 
+        self.waveform = None
+        self.drawwaveform = False
+
         ## end declaring variables ############
 
         # they already were loaded since they are located in the prefs.tx json file
@@ -431,7 +434,12 @@ class Slicer(main.App) :
         for p in self.loopers :
             p.updatetable()
         audio.amp(self.vol)
-            
+        #print( audio.tables[audio.table].getViewTable( (self.width, self.height)  ) )
+
+    def setDrawWave(self):
+        self.drawwaveform = not self.drawwaveform
+        if self.drawwaveform:
+            self.waveform = audio.tables[audio.table].getViewTable( (self.width, int(self.height)) )
 
     def startLayers(self, n, reset=1) :
         """ instantiates basic graphical GUI objects
@@ -633,6 +641,42 @@ class Slicer(main.App) :
         glEnd()
         glDisable(GL_LINE_STIPPLE)
         glPopMatrix()
+
+        if self.drawwaveform and self.waveform:
+            for chanel, points in enumerate(self.waveform): #0,1
+                for n in range(0, len(points), 4): #every N to save cpu
+                    glPushMatrix()
+
+                    glTranslatef(points[n][0], 0, -8) # translate to
+                    glColor4f (0.5, 0.5, 0.5, 0.8)
+                    glLineWidth(1)
+
+                    glBegin(GL_LINES)
+                    glVertex2f(0, points[n][1]) 
+                    glVertex2f(0, points[n+1][1])
+                    glEnd()
+
+                    glPopMatrix()
+            
+
+##        if self.drawwaveform and self.waveform:
+##            pos = self.height/4, (self.height/4)*3
+##            for n, ypos in enumerate(pos): # 2 channels
+##                for p in self.waveform[n]:
+##                    glPushMatrix()
+##
+##                    glTranslatef(p[0]+10, ypos, -200) # translate to
+##                    glColor4f (0.5, 0.5, 0.5, 0.4)
+##                    glLineWidth(1)
+##
+##                    glBegin(GL_LINES)
+##                    glVertex2f(0, p[1]) # draw pixel points
+##                    glVertex2f(0, -p[1])
+####                    glVertex2f(0, p[1]-(110*n)) # draw pixel points
+####                    glVertex2f(0, -p[1]+(110*n))
+##                    glEnd()
+##
+##                    glPopMatrix()
         
         
     def setVol(self, n) :

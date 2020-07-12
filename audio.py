@@ -122,9 +122,6 @@ def createTable( filepath ) :
     return tabdur, stereoflag
 
 
-
-
-
 class SlicerPlayer(object) :
         
     def __init__(self, stereo=False, index=0) :
