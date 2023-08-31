@@ -439,7 +439,7 @@ class Slicer(main.App) :
     def setDrawWave(self):
         self.drawwaveform = not self.drawwaveform
         if self.drawwaveform:
-            self.waveform = audio.tables[audio.table].getViewTable( (self.width, int(self.height)) )
+            self.waveform = audio.tables[audio.table].getViewTable( (self.width-40, int(self.height)) )
 
     def startLayers(self, n, reset=1) :
         """ instantiates basic graphical GUI objects
@@ -647,7 +647,7 @@ class Slicer(main.App) :
                 for n in range(0, len(points), 4): #every N to save cpu
                     glPushMatrix()
 
-                    glTranslatef(points[n][0], 0, -8) # translate to
+                    glTranslatef(points[n][0]+20, 0, -8) # translate to. +20 is Display's margin
                     glColor4f (0.5, 0.5, 0.5, 0.8)
                     glLineWidth(1)
 

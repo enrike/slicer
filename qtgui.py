@@ -1,5 +1,5 @@
 from __future__ import print_function
-from PyQt5 import QtCore, QtWidgets, QtWidgets
+from PyQt6 import QtCore, QtWidgets, QtGui
 from functools import partial
 import mirra
 import os
@@ -38,47 +38,47 @@ def do(mainapp, win):
     # FILE
     fm = win.menuBar().addMenu("&File")
     fm.addAction(
-        QtWidgets.QAction("O&pen", win, shortcut="Ctrl+O", triggered=openFile)
+        QtGui.QAction("O&pen", win, shortcut="Ctrl+O", triggered=openFile)
     )
     fm.addAction(
-        QtWidgets.QAction("S&ave", win, shortcut="Ctrl+S", triggered=save)
+        QtGui.QAction("S&ave", win, shortcut="Ctrl+S", triggered=save)
     )
     fm.addAction(
-        QtWidgets.QAction("S&ave As", win, shortcut="Ctrl+SHIFT+S", triggered=saveAs)
-    )
-    fm.addSeparator() #---------
-    fm.addAction(
-        QtWidgets.QAction("D&raw waveform", win, shortcut="Ctrl+F", triggered=setDrawWave)
+        QtGui.QAction("S&ave As", win, shortcut="Ctrl+SHIFT+S", triggered=saveAs)
     )
     fm.addSeparator() #---------
     fm.addAction(
-        QtWidgets.QAction("E&xit", win, shortcut="Ctrl+Q", triggered=app.end)
+        QtGui.QAction("D&raw waveform", win, shortcut="Ctrl+F", triggered=setDrawWave)
+    )
+    fm.addSeparator() #---------
+    fm.addAction(
+        QtGui.QAction("E&xit", win, shortcut="Ctrl+Q", triggered=app.end)
     )
     
     # SNAPSHOT
     sm = win.menuBar().addMenu("&Snapshot")
     sm.addAction(
-        QtWidgets.QAction("O&pen snapshot", win, triggered=openSnapFile)
+        QtGui.QAction("O&pen snapshot", win, triggered=openSnapFile)
     )
     sm.addAction(
-        QtWidgets.QAction("S&ave snapshot", win, triggered=saveSnap)
+        QtGui.QAction("S&ave snapshot", win, triggered=saveSnap)
     )
     sm.addAction(
-        QtWidgets.QAction("S&ave snapshot As", win, triggered=saveSnapAs)
+        QtGui.QAction("S&ave snapshot As", win, triggered=saveSnapAs)
     )
     fm.addSeparator() #---------
     sm.addAction(
-        QtWidgets.QAction("Toogle load snap mode", win, triggered=app.toogleLoadSnapMode)
+        QtGui.QAction("Toogle load snap mode", win, triggered=app.toogleLoadSnapMode)
     )
     sm.addSeparator() #---------
     for i in range(10):
         sm.addAction(
-            QtWidgets.QAction("L&OAD snapshot %i" %i, win, triggered=partial(setSnapshot, i))
+            QtGui.QAction("L&OAD snapshot %i" %i, win, triggered=partial(setSnapshot, i))
         )
     sm.addSeparator() #---------
     for i in range(10):
         sm.addAction(
-            QtWidgets.QAction("S&TORE snapshot %i" %i, win, triggered=partial(app.storeSnapshot, i))
+            QtGui.QAction("S&TORE snapshot %i" %i, win, triggered=partial(app.storeSnapshot, i))
         )
 
     # SOUND POOl
@@ -87,13 +87,13 @@ def do(mainapp, win):
     # VOLUME
     vm = win.menuBar().addMenu("&Volume")
     vm.addAction( # MUTE
-            QtWidgets.QAction("M&ute", win, shortcut="Ctrl+M", triggered= partial(volChange, 0) )
+            QtGui.QAction("M&ute", win, shortcut="Ctrl+M", triggered= partial(volChange, 0) )
     )
     for i in range(1,11): # 1 to 10
         n = i
         if n == 10: n = 0 # 10 corresponds to key 0
         vm.addAction( 
-            QtWidgets.QAction("V&olume %s" %(i/10.), win, shortcut="Ctrl+%s" % n,
+            QtGui.QAction("V&olume %s" %(i/10.), win, shortcut="Ctrl+%s" % n,
             triggered= partial(volChange, i) )
         )
 
@@ -102,89 +102,89 @@ def do(mainapp, win):
 
     for i in range(1,9):
         nm.addAction(
-            QtWidgets.QAction("%s&" % i, win, triggered = partial(app.nol, i))
+            QtGui.QAction("%s&" % i, win, triggered = partial(app.nol, i))
         )
 
     # AUTO
     am = win.menuBar().addMenu("&Auto")
     am.addAction( # Auto movement
-            QtWidgets.QAction("A&utomove  toggle", win, triggered=autoNodes )
+            QtGui.QAction("A&utomove  toggle", win, triggered=autoNodes )
     )
     am.addAction( # INCREASE Auto movement
-        QtWidgets.QAction("I&ncrease movement", win, shortcut="Ctrl++",
+        QtGui.QAction("I&ncrease movement", win, shortcut="Ctrl++",
                       triggered=partial(changeAuto, 0.25) )
     )
     am.addAction( # DECRESE Auto movement
-        QtWidgets.QAction("D&ecrease movement", win, shortcut="Ctrl+-",
+        QtGui.QAction("D&ecrease movement", win, shortcut="Ctrl+-",
                       triggered=partial(changeAuto, -0.25) )
     )
     am.addAction( # Auto movement
-        QtWidgets.QAction("B&ounce toggle", win, triggered=bounce )
+        QtGui.QAction("B&ounce toggle", win, triggered=bounce )
     )
     am.addSeparator() #--------- 
     am.addAction( # Random
-            QtWidgets.QAction("R&andom situation", win, shortcut="Ctrl+R",
+            QtGui.QAction("R&andom situation", win, shortcut="Ctrl+R",
             triggered=app.randomSituation )
         )
     am.addAction( # Random boxes
-        QtWidgets.QAction("R&andom Boxes", win, shortcut="Ctrl+B",
+        QtGui.QAction("R&andom Boxes", win, shortcut="Ctrl+B",
         triggered=app.randomBoxes )
     )
     am.addAction( # Random boxes small
-        QtWidgets.QAction("R&andom step Boxes", win, shortcut="Ctrl+D",
+        QtGui.QAction("R&andom step Boxes", win, shortcut="Ctrl+D",
         triggered=app.randomBoxesSmall )
     )
     am.addAction( # Random all nodes
-        QtWidgets.QAction("R&andom ALL nodes", win, shortcut="Ctrl+N",
+        QtGui.QAction("R&andom ALL nodes", win, shortcut="Ctrl+N",
         triggered=app.randomNodes )
     )
     am.addAction( # Random B/W NO Pitch!
-        QtWidgets.QAction("R&andom B/W nodes", win, shortcut="Ctrl+V",
+        QtGui.QAction("R&andom B/W nodes", win, shortcut="Ctrl+V",
         triggered=partial(app.randomNodes, 1) )
     )
     am.addAction( # Random White
-        QtWidgets.QAction("R&andom White node", win, shortcut="Ctrl+X",
+        QtGui.QAction("R&andom White node", win, shortcut="Ctrl+X",
         triggered=partial(app.randomSingleNode, 'white') )
     )
     am.addAction( # Random White small
-        QtWidgets.QAction("R&andom step White node", win, shortcut="Ctrl+Z",
+        QtGui.QAction("R&andom step White node", win, shortcut="Ctrl+Z",
         triggered=partial(app.randomSingleNode, 'white', 1)  )
     )
     am.addAction( # Random Black
-        QtWidgets.QAction("R&andom Black node", win, shortcut="Ctrl+C",
+        QtGui.QAction("R&andom Black node", win, shortcut="Ctrl+C",
         triggered=partial(app.randomSingleNode, 'black') )
     )
     am.addAction( # Random Grey
-        QtWidgets.QAction("R&andom Grey node", win,
+        QtGui.QAction("R&andom Grey node", win,
         triggered=partial(app.randomSingleNode, 'grey') )
     )
 
     # FREEDOMS
     fm = win.menuBar().addMenu("&Freedom & control")
     fm.addAction( 
-        QtWidgets.QAction("I&nverse Panning", win, triggered=inversepan )
+        QtGui.QAction("I&nverse Panning", win, triggered=inversepan )
     )
 ##    fm.addAction( 
-##        QtWidgets.QAction("T&oggle OSC remote control of handles", win, triggered=app.toggleOSCControl )
+##        QtGui.QAction("T&oggle OSC remote control of handles", win, triggered=app.toggleOSCControl )
 ##    )
 ##    fm.addAction( 
-##        QtWidgets.QAction("R&eset OSC connection", win, triggered=app.setOSC )
+##        QtGui.QAction("R&eset OSC connection", win, triggered=app.setOSC )
 ##    )
     fm.addSeparator() #---------
     fm.addAction( 
-        QtWidgets.QAction("T&oggle pitch block", win, triggered=partial(toggleFreedom, 'pitch') )
+        QtGui.QAction("T&oggle pitch block", win, triggered=partial(toggleFreedom, 'pitch') )
     )
     fm.addAction( 
-        QtWidgets.QAction("T&oggle grainshift block", win, triggered=partial(toggleFreedom, 'grainshift') )
+        QtGui.QAction("T&oggle grainshift block", win, triggered=partial(toggleFreedom, 'grainshift') )
     )
     fm.addAction( 
-        QtWidgets.QAction("T&oggle length block", win, triggered=partial(toggleFreedom, 'length') )
+        QtGui.QAction("T&oggle length block", win, triggered=partial(toggleFreedom, 'length') )
     )
     fm.addAction( 
-        QtWidgets.QAction("T&oggle shift block", win, triggered=partial(toggleFreedom, 'shift') )
+        QtGui.QAction("T&oggle shift block", win, triggered=partial(toggleFreedom, 'shift') )
     )
     fm.addAction( 
-        QtWidgets.QAction("T&oggle start block", win, triggered=partial(toggleFreedom, 'start') )
+        QtGui.QAction("T&oggle start block", win, triggered=partial(toggleFreedom, 'start') )
     )
 
 
@@ -274,7 +274,7 @@ def addSnd():
         if fil == '' or not fil: return -1
         name = os.path.basename(fil)
         poolMenu.addAction( 
-            QtWidgets.QAction("&%s" % name, qtwin,triggered=partial(app.loadSnd, fil))
+            QtGui.QAction("&%s" % name, qtwin,triggered=partial(app.loadSnd, fil))
         )
         
 ##    sndfolders
@@ -292,7 +292,7 @@ def addFolder(path=False):
             fpath = os.path.join(root, s)
             if '.wav' in s or '.flac' in s or '.aiff' in s: ## filter out no sounds
                 poolMenu.addAction( 
-                    QtWidgets.QAction("&%s" % s, qtwin,triggered=partial(app.loadSnd, fpath))
+                    QtGui.QAction("&%s" % s, qtwin,triggered=partial(app.loadSnd, fpath))
              )
 
     if not path in sndfolders:
@@ -306,13 +306,13 @@ def doPoolMenu():
         poolMenu = qtwin.menuBar().addMenu("&SoundPool")
         
     poolMenu.addAction(
-            QtWidgets.QAction("A&dd sound to pool", qtwin, triggered=addSnd)
+            QtGui.QAction("A&dd sound to pool", qtwin, triggered=addSnd)
     )
     poolMenu.addAction(
-            QtWidgets.QAction("A&dd folder to pool", qtwin, triggered=addFolder)
+            QtGui.QAction("A&dd folder to pool", qtwin, triggered=addFolder)
     )
     poolMenu.addAction(
-            QtWidgets.QAction("C&LEAR pool", qtwin, triggered=clearMenu)
+            QtGui.QAction("C&LEAR pool", qtwin, triggered=clearMenu)
     )
     poolMenu.addSeparator() #---------
 
@@ -320,7 +320,7 @@ def doPoolMenu():
     
     for f in filePool :
         poolMenu.addAction( 
-            QtWidgets.QAction("&%s" % os.path.basename(f), qtwin, triggered=partial(app.loadSnd, f))
+            QtGui.QAction("&%s" % os.path.basename(f), qtwin, triggered=partial(app.loadSnd, f))
     )  
 
 def clearMenu():
