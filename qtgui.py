@@ -282,7 +282,7 @@ def addFolder(path=False):
     if path == False:
         init = os.path.basename(fileName)
         path = QtWidgets.QFileDialog.getExistingDirectory(None, 'Select a folder:', init,
-                                                      QtWidgets.QFileDialog.ShowDirsOnly)
+                                                      QtWidgets.QFileDialog.Option.ShowDirsOnly)
     # TO DO: THIS dialogue should allow to see the files. otherwise we dont know whats in the dirs
     if os.path.isfile(path): # if selected a file
         path = os.path.dirname(path)

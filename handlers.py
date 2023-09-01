@@ -428,7 +428,7 @@ class Display(Rect) :
     """
     def __init__(self, x,y,z,w,h,forecolor) :#bgcolor,forecolor) :
         Rect.__init__(self, x,y,z,w,h, stroke=1)
-        self.interactiveState = 1 # mouseable
+        self.interactiveState = 1 # mouseable. not draggable
         self.forecolor = forecolor[0],forecolor[1],forecolor[2],1
         self.color = 0.4, 0.4, 0.4, 1 # marquee color
         self.oldcolor = self.color
