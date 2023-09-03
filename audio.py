@@ -34,10 +34,13 @@ pyoserver = None
 table = "" #filename used to access tables dict
 tabrate = None
 tables = {}
+tableview=None
 
-
-
-
+            
+def updateViewTable(size):
+    global tableview, tables
+    tableview = tables[table].getViewTable( size )
+    
 
 def startServer(rate=44100, jack=True,  channels=2):
     global pyoserver
@@ -89,9 +92,12 @@ def recstop() :
 ##        This method creates a file called `pyo_rec.aif` in the 
 ##        user's home directory if a path is not supplied.
 ##    recstop()
+
+def getCurrentTable():
+    return tables[table]
         
 def createTable( filepath ) :
-    global table,tabrate, tables
+    global table, tabrate, tables
     table = filepath.split(os.sep)[-1] #filename to access sound dict
     tabrate = None
 
@@ -107,8 +113,9 @@ def createTable( filepath ) :
             tables[table] = SndTable(path)
     ##        except :
     ##                print "error loading sound: cannot handle that format?"
-    ##                return -1   
-        
+    ##                return -1
+    else:
+        print("--> table already there, no need to load", table )
 
     tabdur = tables[table].getDur()
     print('length is', tabdur)
@@ -211,13 +218,15 @@ if __name__ == '__main__' :
 
     startServer(jack=True) #, rate=96000)
 
-    length, stereo = createTable("/home/r2d2/Mahaigaina/audio/feedback/SC_200609_170025_comp.flac")
+    length, stereo = createTable("test.flac")
     num = SlicerPlayer(stereo)
 ####    b= SlicerPlayer(stereo)
     num.setPitch(1.2)
 ##    num.setStart(0.2)
 ##    num.setDur(0.005)
     num.vol(0.1)
+
+    updateViewTable( (600,400) )
 
     while 1: pass
     
