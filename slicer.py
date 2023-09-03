@@ -427,20 +427,88 @@ class Slicer(main.App) :
         audio.amp(self.vol)
 
 
-    def loadSnd(self, filename) : # from launchAudio and from setSession        
+    def loadSnd(self, filename) : # from launchAudio and from setSession
+        print("load sound")
         self.sndFile = filename # in case it was triggered from menu
         audio.amp(0)
         self.sndLength, stereo = audio.createTable(filename)
         for p in self.loopers :
             p.updatetable()
         audio.amp(self.vol)
-        #print( audio.tables[audio.table].getViewTable( (self.width, self.height)  ) )
-
+        if self.drawwaveform:
+            audio.updateViewTable( (self.width-40, int(self.height)) ) #update
+            self.compilewaveform()
+        
     def setDrawWave(self):
         self.drawwaveform = not self.drawwaveform
         if self.drawwaveform:
-            self.waveform = audio.tables[audio.table].getViewTable( (self.width-40, int(self.height)) )
+            if audio.tableview==None:
+                audio.updateViewTable( (self.width-40, int(self.height)) )
+            self.compilewaveform()
 
+    def compileLines(self):
+        glNewList(667, GL_COMPILE)
+        # draw zero line #
+        glPushMatrix()
+        glTranslatef(self.width2, self.drawZeroY, -999) # translate to GL loc point
+
+        glEnable(GL_LINE_STIPPLE)
+        glLineStipple(1, 0xF0F0)
+        glLineWidth(1)
+
+        glBegin(GL_LINES)
+        glVertex2f( -self.width2, 0 )
+        glVertex2f( self.width2, 0 ) 
+        glEnd()
+        
+        glPopMatrix()
+        
+        # draw one line #
+        if self.drawOneY != self.height/2 :
+            glPushMatrix()
+            glTranslatef(self.width2,  self.drawOneY, -999) # translate to GL loc point
+            
+            glLineStipple(1, 0xFAF0)
+            
+            glBegin(GL_LINES)
+            glVertex2f( -self.width2, 0 )
+            glVertex2f( self.width2, 0 ) 
+            glEnd()
+            
+            glPopMatrix()
+        ####################
+        glPushMatrix()
+        glTranslatef(self.width2, self.height/2, -999) # translate to GL loc point
+        
+        glLineStipple(1, 0x1C47)
+        glColor4fv( (0.3,0.3, 0.7,1) ) # kind of blue
+        glBegin(GL_LINES)
+        glVertex2f( -self.width2, 0 )
+        glVertex2f( self.width2, 0 ) 
+        glEnd()
+        glDisable(GL_LINE_STIPPLE)
+        glPopMatrix()
+
+        glEndList() ###
+            
+    def compilewaveform(self):
+        glNewList(666, GL_COMPILE)
+        for chanel, points in enumerate(audio.tableview): #0,1
+            for n in range(0, len(points), 5): #every N to save cpu
+                glPushMatrix()
+
+                glTranslatef(points[n][0]+20, 0, -8) # translate to. +20 is Display's margin
+                glColor4f (0.5, 0.5, 0.5, 0.8)
+                glLineWidth(1)
+
+                glBegin(GL_LINES)
+                glVertex2f(0, points[n][1]) 
+                glVertex2f(0, points[n+1][1])
+                glEnd()
+
+                glPopMatrix()
+        glEndList() ###
+            
     def startLayers(self, n, reset=1) :
         """ instantiates basic graphical GUI objects
         """        
@@ -600,85 +668,16 @@ class Slicer(main.App) :
 ##            self.massCenter = self.averageCenter()
 ##            self.flockSpeed = self.averageSpeed()
 
+    def firstrender(self): # this only happens prev to the first render in the app and after the render in the engine
+        self.compileLines()
+
     def render(self):
-        # draw zero line #
-        glPushMatrix()
-        glTranslatef(self.width2, self.drawZeroY, -999) # translate to GL loc point
+        glCallList(667)
+        if self.drawwaveform and audio.tableview:
+            glCallList(666)
 
-        glEnable(GL_LINE_STIPPLE)
-        glLineStipple(1, 0xF0F0)
-        glLineWidth(1)
 
-        glBegin(GL_LINES)
-        glVertex2f( -self.width2, 0 )
-        glVertex2f( self.width2, 0 ) 
-        glEnd()
-        
-        glPopMatrix()
-        
-        # draw one line #
-        if self.drawOneY != self.height/2 :
-            glPushMatrix()
-            glTranslatef(self.width2,  self.drawOneY, -999) # translate to GL loc point
-            
-            glLineStipple(1, 0xFAF0)
-            
-            glBegin(GL_LINES)
-            glVertex2f( -self.width2, 0 )
-            glVertex2f( self.width2, 0 ) 
-            glEnd()
-            
-            glPopMatrix()
-        ####################
-        glPushMatrix()
-        glTranslatef(self.width2, self.height/2, -999) # translate to GL loc point
-        
-        glLineStipple(1, 0x1C47)
-        glColor4fv( (0.3,0.3, 0.7,1) ) # kind of blue
-        glBegin(GL_LINES)
-        glVertex2f( -self.width2, 0 )
-        glVertex2f( self.width2, 0 ) 
-        glEnd()
-        glDisable(GL_LINE_STIPPLE)
-        glPopMatrix()
-
-        if self.drawwaveform and self.waveform:
-            for chanel, points in enumerate(self.waveform): #0,1
-                for n in range(0, len(points), 4): #every N to save cpu
-                    glPushMatrix()
-
-                    glTranslatef(points[n][0]+20, 0, -8) # translate to. +20 is Display's margin
-                    glColor4f (0.5, 0.5, 0.5, 0.8)
-                    glLineWidth(1)
-
-                    glBegin(GL_LINES)
-                    glVertex2f(0, points[n][1]) 
-                    glVertex2f(0, points[n+1][1])
-                    glEnd()
-
-                    glPopMatrix()
-            
-
-##        if self.drawwaveform and self.waveform:
-##            pos = self.height/4, (self.height/4)*3
-##            for n, ypos in enumerate(pos): # 2 channels
-##                for p in self.waveform[n]:
-##                    glPushMatrix()
-##
-##                    glTranslatef(p[0]+10, ypos, -200) # translate to
-##                    glColor4f (0.5, 0.5, 0.5, 0.4)
-##                    glLineWidth(1)
-##
-##                    glBegin(GL_LINES)
-##                    glVertex2f(0, p[1]) # draw pixel points
-##                    glVertex2f(0, -p[1])
-####                    glVertex2f(0, p[1]-(110*n)) # draw pixel points
-####                    glVertex2f(0, -p[1]+(110*n))
-##                    glEnd()
-##
-##                    glPopMatrix()
-        
-        
+                    
     def setVol(self, n) :
         if n > 1 : n = 1
         if n < 0 : n = 0

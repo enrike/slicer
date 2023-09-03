@@ -76,13 +76,25 @@ class SmallBox(SRect) :
         if vol < 0 : vol = 0 
         return vol
 
-    def render(self) : 
+    def render(self) :
+##        if self.clicked:
         glColor4fv(self.color)
         glPushMatrix()
         glTranslatef(self.x, self.y, -self.z)
         glRectf(-self.width2, -self.height2 , self.width2, self.height2)
         glPopMatrix()
-
+##        else :
+##            glCallList(1000+self.z) 
+            
+##    def compileGL(self):
+##        glNewList(1000+self.z, GL_COMPILE)
+##        glColor4fv(self.color)
+##        glPushMatrix()
+##        glTranslatef(self.x, self.y, -self.z)
+##        glRectf(-self.width2, -self.height2 , self.width2, self.height2)
+##        glPopMatrix()
+##        glEndList() ###
+        
     def mouseDown(self,x,y) :
         SRect.mouseDown(self,x,y)
         if len(Selectable.selection.selected)==1 :
@@ -443,6 +455,9 @@ class Display(Rect) :
         self.num = Text(str(z), labelx, (self.y-self.height2+font+2), self.z+1, 'helvetica', font, self.textcolors[0]) # number, doesnt change
         self.mybox = 0 # to store ref to box where i am related to
         self.playhead = self.x - self.width2 # left position
+        self.bgleft = self.x - self.width2  # display's marquee left side position
+
+        self.starting = 1     
 
     def end(self) : # extending end
         self.num.end()
@@ -480,16 +495,15 @@ class Display(Rect) :
         self.app.loopers[self.z].setStart( st ) 
         self.app.loopers[self.z].setDur( dur )
 
+        self.compileSelectionGL()
+
     def calcLimits(self) :
         return self.limits[0]/self.width, self.limits[1]/self.width
-    
-    def render(self) : 
-        if self.blend < 1:
-            glColor3fv( (1,0,0) ) # dark grey this one
-        else :
-            glColor3fv(self.textcolors[0]) # 
+
+    def compileMarquee(self):
+        glNewList(1000+self.z, GL_COMPILE)
         
-        # marquee
+         # marquee
         glPushMatrix()
         glEnable(GL_LINE_STIPPLE)
         glLineStipple(1, 0x1111) # 0x0101 dotted # 0x00FF  dashed #0x1C47  dash/dot/dash
@@ -504,21 +518,21 @@ class Display(Rect) :
         glDisable(GL_LINE_STIPPLE)
         glPopMatrix()
 
-        bgleft = self.x - self.width2  # display's marquee left side
+        glEndList() ###
+
+    def compileSelectionGL(self):
         w = (self.limits[1] - self.limits[0] + 1)*0.5 # half width of color area
-        x = bgleft + self.limits[0] + w # x loc of color rect
+        x = self.bgleft + self.limits[0] + w # x loc of color rect
         
-        # colored selection area #
+        glNewList(2000+self.z, GL_COMPILE)
+        
         glColor4fv(self.forecolor) # black? 
         glPushMatrix()
         glTranslatef(x, self.y, -self.z) # translate to GL loc ppint
         glRectf(-w, -self.height2+1, w, self.height2)
         glPopMatrix()
 
-        # marquee
-        self.playhead = (self.app.loopers[self.z].pos * self.width) + bgleft
-
-        # reference line
+        # reference vertical dashed lines
         glColor4fv( self.forecolor ) 
         glPushMatrix()
         glTranslatef( x, 0, -self.z ) # translate to GL loc ppint
@@ -534,7 +548,34 @@ class Display(Rect) :
         glDisable(GL_LINE_STIPPLE)
         glPopMatrix()
         
+        glEndList() ###
+
+    def compileRedSquare(self):
+        glNewList(3000+self.z, GL_COMPILE)
+        glPushMatrix()
+        glTranslatef(20, self.y, -self.z)
+        glRectf(-7,-7,7,7)
+        glPopMatrix()
+        glEndList() ###
+
+    def firstrender(self):
+        self.compileMarquee()
+        self.compileSelectionGL()
+        self.compileRedSquare()
+        
+    def render(self) :    
+        if self.blend < 1:
+            glColor3fv( (1,0,0) ) # dark grey this one
+        else :
+            glColor3fv(self.textcolors[0]) # 
+        
+        glCallList(1000+self.z) # marquee
+
+        glCallList(2000+self.z) # selection
+        
         # playhead line
+        self.playhead = (self.app.loopers[self.z].pos * self.width) + self.bgleft
+
         glColor4fv( (1,0,0,1) ) ### EVERYTHING below goes red but normal volume ###
         glPushMatrix()
         glTranslatef( self.playhead, self.y, -self.z ) # translate to GL loc ppint
@@ -547,10 +588,7 @@ class Display(Rect) :
 
         # red mark # already drawing red at this point
         if self.selected : # mark as selected
-            glPushMatrix()
-            glTranslatef(20, self.y, -self.z)
-            glRectf(-7,-7,7,7)
-            glPopMatrix()
+             glCallList(3000+self.z) # 
 
         # amp/MUTED label #
         if self.blend < 1:
